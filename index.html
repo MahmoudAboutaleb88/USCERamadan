@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#667eea">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="System Login">
+    <title>Savola Foods</title>
+
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('background.png') center/cover no-repeat fixed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 0;
+        }
+
+        /* ======= شاشة اللوجين ======= */
+        #loginScreen {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #loginScreen.hidden {
+            display: none;
+        }
+
+        .login-container {
+            background: rgba(255,255,255,0.95);
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 100%;
+            max-width: 450px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: slideUp 0.6s ease-out;
+            margin: 20px;
+        }
+
+        @keyframes slideUp {
+            from { opacity:0; transform:translateY(30px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 8px;
+            text-align: center;
+            font-size: 30px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #999;
+            margin-bottom: 35px;
+            font-size: 13px;
+        }
+
+        .form-group { margin-bottom: 22px; }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: rgba(245,245,245,0.8);
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+            transform: translateY(-2px);
+        }
+
+        input::placeholder { color: #aaa; }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+        }
+
+        button[type="submit"]:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 25px rgba(102,126,234,0.6);
+        }
+
+        button[type="submit"]:disabled { opacity:0.7; cursor:not-allowed; }
+
+        .msg {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+            animation: fadeIn 0.3s ease-out;
+        }
+        .msg.error   { color:#e74c3c; background:rgba(231,76,60,0.1);  border:1.5px solid #e74c3c; }
+        .msg.success { color:#27ae60; background:rgba(39,174,96,0.1);   border:1.5px solid #27ae60; }
+        .msg.info    { color:#3498db; background:rgba(52,152,219,0.1);  border:1.5px solid #3498db; }
+
+        @keyframes fadeIn {
+            from { opacity:0; transform:translateY(-8px); }
+            to   { opacity:1; transform:translateY(0); }
+        }
+
+        .loading { display:none; text-align:center; margin-top:18px; }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width:40px; height:40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        .loading p { margin-top:12px; color:#667eea; font-weight:600; }
+
+        /* ======= الـ iframe ======= */
+        #appFrame {
+            display: none;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            z-index: 999;
+        }
+
+        #appFrame.visible {
+            display: block;
+        }
+
+        /* ======= install prompt ======= */
+        .install-prompt {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            animation: bounceIn 0.5s ease-out;
+            max-width: 90%;
+        }
+
+        @keyframes bounceIn {
+            0%   { opacity:0; transform:translateX(-50%) scale(0.8); }
+            50%  { transform:translateX(-50%) scale(1.05); }
+            100% { opacity:1; transform:translateX(-50%) scale(1); }
+        }
+
+        .install-prompt button {
+            background: white;
+            color: #667eea;
+            padding: 8px 18px;
+            margin: 0 4px;
+            border-radius: 25px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        .install-prompt .dismiss {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        @media (max-width: 600px) {
+            .login-container { padding:35px 25px; margin:15px; }
+            h1 { font-size:24px; }
+            input, button[type="submit"] { font-size:15px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ======= شاشة اللوجين ======= -->
+<div id="loginScreen">
+    <div class="login-container">
+        <h1>🔐 تسجيل الدخول</h1>
+        <p class="subtitle">أدخل بياناتك للمتابعة</p>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">اسم المستخدم</label>
+                <input type="text" id="username" name="username"
+                       placeholder="أدخل اسم المستخدم" required autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label for="password">كلمة المرور</label>
+                <input type="password" id="password" name="password"
+                       placeholder="أدخل كلمة المرور" required autocomplete="current-password">
+            </div>
+            <button type="submit" id="loginBtn">تسجيل الدخول</button>
+        </form>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>جاري التحقق...</p>
+        </div>
+
+        <div class="msg error"   id="msgError"></div>
+        <div class="msg success" id="msgSuccess"></div>
+        <div class="msg info"    id="msgInfo"></div>
+    </div>
+</div>
+
+<!-- ======= الـ iframe اللي هيشغّل التطبيق كله ======= -->
+<iframe id="appFrame" src="about:blank"></iframe>
+
+<div class="install-prompt" id="installPrompt">
+    <span>📱 ثبّت التطبيق على جهازك &nbsp;</span>
+    <button id="installBtn">تثبيت</button>
+    <button class="dismiss" id="dismissBtn">لاحقاً</button>
+</div>
+
+<script>
+    // ============================================================
+    // ⚙️ الإعدادات
+    // ============================================================
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwztJdA4AcbAlXIggDE_eEZVPOhiF0H6kIZ3WnVLsYatrXWSa0bHOrXK_1fnrKH131jmg/exec';
+
+    const ROLE_PAGES = {
+        'facility': 'orders.html',
+        'admin':    'admin-dashboard.html'
+    };
+
+    const DEFAULT_PAGE = 'home.html';
+    // ============================================================
+
+    // ---- PWA ----
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () =>
+            navigator.serviceWorker.register('sw.js').catch(() => {})
+        );
+    }
+
+    let deferredPrompt;
+    const installPrompt = document.getElementById('installPrompt');
+
+    window.addEventListener('beforeinstallprompt', e => {
+        e.preventDefault();
+        deferredPrompt = e;
+        setTimeout(() => installPrompt.style.display = 'flex', 3000);
+    });
+
+    document.getElementById('installBtn').addEventListener('click', async () => {
+        if (!deferredPrompt) return;
+        installPrompt.style.display = 'none';
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') showMsg('info', '✅ تم التثبيت بنجاح!');
+        deferredPrompt = null;
+    });
+
+    document.getElementById('dismissBtn').addEventListener('click', () => {
+        installPrompt.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+        installPrompt.style.display = 'none';
+        deferredPrompt = null;
+    });
+
+    // ---- Helpers ----
+    function showMsg(type, text) {
+        document.querySelectorAll('.msg').forEach(el => {
+            el.style.display = 'none';
+            el.textContent = '';
+        });
+        const el = document.getElementById(
+            'msg' + type.charAt(0).toUpperCase() + type.slice(1)
+        );
+        if (el) { el.textContent = text; el.style.display = 'block'; }
+    }
+
+    function setLoading(on) {
+        document.getElementById('loading').style.display = on ? 'block' : 'none';
+        document.getElementById('loginBtn').disabled     = on;
+    }
+
+    // ---- تحميل التطبيق في الـ iframe ----
+    function loadAppInFrame(targetPage) {
+        const loginScreen = document.getElementById('loginScreen');
+        const appFrame    = document.getElementById('appFrame');
+
+        // نخفي اللوجين ونظهر الـ iframe
+        loginScreen.classList.add('hidden');
+        appFrame.classList.add('visible');
+
+        // نحمّل الصفحة المطلوبة
+        appFrame.src = targetPage;
+    }
+
+    // ---- Login ----
+    document.getElementById('loginForm').addEventListener('submit', async e => {
+        e.preventDefault();
+
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value.trim();
+
+        document.querySelectorAll('.msg').forEach(el => el.style.display = 'none');
+
+        if (!username || !password) {
+            showMsg('error', '❌ يرجى ملء جميع الحقول');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const res = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ username, password })
+            });
+
+            const result = await res.json();
+
+            if (result.ok) {
+                const userData = {
+                    User_Name:  result.User_Name,
+                    Numbers:    result.Numbers,
+                    Department: result.Department,
+                    Role:       result.Role
+                };
+
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                sessionStorage.setItem('loginTime',   new Date().toISOString());
+
+                showMsg('success', `✅ مرحباً ${result.User_Name}! جاري التوجيه...`);
+
+                const role       = (result.Role || '').trim().toLowerCase();
+                const targetPage = ROLE_PAGES[role] || DEFAULT_PAGE;
+
+                // بعد ثانية ونص نحمّل الصفحة في الـ iframe
+                setTimeout(() => loadAppInFrame(targetPage), 1500);
+
+            } else {
+                setLoading(false);
+
+                const errorMessages = {
+                    'not_found':      '❌ اسم المستخدم غير موجود',
+                    'wrong_password': '❌ كلمة المرور غير صحيحة',
+                    'missing_fields': '❌ يرجى ملء جميع الحقول',
+                    'server_error':   `❌ خطأ في الخادم: ${result.message || ''}`
+                };
+
+                showMsg('error', errorMessages[result.error] || '❌ خطأ في تسجيل الدخول');
+            }
+
+        } catch (err) {
+            setLoading(false);
+            showMsg('error', `❌ خطأ في الاتصال: ${err.message}`);
+        }
+    });
+</script>
+
+</body>
+</html>
