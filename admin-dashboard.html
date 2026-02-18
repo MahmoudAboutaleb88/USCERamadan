@@ -524,6 +524,19 @@
       .search-box { min-width: 0; flex:1; }
       .select-box { width: 100%; }
     }
+/* إصلاح مشكلة عناصر القائمة المنسدلة */
+.select-box option {
+  background-color: #1a1a2e !important; /* غامق عشان يبقى واضح */
+  color: #ffffff !important;            /* نص أبيض واضح */
+  padding: 8px;
+}
+
+/* عند الوقوف على العنصر (Hover) */
+.select-box option:hover,
+.select-box option:checked {
+  background-color: #e94560 !important;
+  color: #fff !important;
+}
   </style>
 </head>
 <body>
