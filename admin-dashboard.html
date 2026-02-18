@@ -28,7 +28,6 @@
       overflow-x: hidden;
     }
 
-    /* ── Background mesh ── */
     body::before {
       content: '';
       position: fixed;
@@ -40,7 +39,6 @@
       z-index: 0;
     }
 
-    /* ── Header ── */
     header {
       position: relative;
       z-index: 10;
@@ -66,482 +64,266 @@
       box-shadow: 0 4px 15px rgba(233,69,96,0.4);
     }
 
-    .header-title h1 {
-      font-size: 20px;
-      font-weight: 900;
-      color: var(--text);
-      line-height: 1.2;
-    }
-
-    .header-title p {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
+    .header-title h1 { font-size: 20px; font-weight: 900; color: var(--text); line-height: 1.2; }
+    .header-title p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
     .dept-badge {
       background: linear-gradient(135deg, var(--gold), #c0392b);
-      color: white;
-      padding: 6px 18px;
-      border-radius: 30px;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
+      color: white; padding: 6px 18px; border-radius: 30px;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.5px;
       box-shadow: 0 3px 12px rgba(233,69,96,0.4);
     }
 
-    .user-info {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .user-info { display:flex; align-items:center; gap:10px; }
 
     .avatar {
       width: 38px; height: 38px;
       background: linear-gradient(135deg, var(--accent), var(--light));
       border-radius: 50%;
       display: flex; align-items:center; justify-content:center;
-      font-size: 16px;
-      font-weight: 700;
-      color: white;
+      font-size: 16px; font-weight: 700; color: white;
     }
 
-    .user-details span {
-      display: block;
-      font-size: 13px;
-      font-weight: 700;
-      color: var(--text);
-    }
-
-    .user-details small {
-      font-size: 11px;
-      color: var(--muted);
-    }
+    .user-details span { display:block; font-size:13px; font-weight:700; color:var(--text); }
+    .user-details small { font-size:11px; color:var(--muted); }
 
     .logout-btn {
       background: rgba(233,69,96,0.15);
       border: 1px solid rgba(233,69,96,0.4);
-      color: var(--gold);
-      padding: 8px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Cairo', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.25s;
+      color: var(--gold); padding: 8px 18px; border-radius: 8px;
+      cursor: pointer; font-family:'Cairo',sans-serif;
+      font-size:13px; font-weight:600; transition: all 0.25s;
     }
+    .logout-btn:hover { background: var(--gold); color: white; }
 
-    .logout-btn:hover {
-      background: var(--gold);
-      color: white;
-    }
-
-    /* ── Main ── */
     main {
-      position: relative;
-      z-index: 1;
-      padding: 32px 36px;
-      max-width: 1200px;
-      margin: 0 auto;
+      position: relative; z-index: 1;
+      padding: 32px 36px; max-width: 1200px; margin: 0 auto;
     }
 
-    /* ── Stats bar ── */
+    /* Stats */
     .stats-bar {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 18px;
-      margin-bottom: 32px;
+      gap: 18px; margin-bottom: 32px;
     }
 
     .stat-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px 22px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 14px; padding: 20px 22px;
+      display: flex; align-items:center; gap:14px;
       backdrop-filter: blur(8px);
       transition: transform 0.25s, border-color 0.25s;
     }
-
-    .stat-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(233,69,96,0.3);
-    }
+    .stat-card:hover { transform: translateY(-3px); border-color: rgba(233,69,96,0.3); }
 
     .stat-icon {
-      width: 44px; height: 44px;
-      border-radius: 10px;
-      display: flex; align-items:center; justify-content:center;
-      font-size: 20px;
-      flex-shrink: 0;
+      width:44px; height:44px; border-radius:10px;
+      display:flex; align-items:center; justify-content:center;
+      font-size:20px; flex-shrink:0;
+    }
+    .stat-icon.blue  { background: rgba(15,52,96,0.6); }
+    .stat-icon.red   { background: rgba(233,69,96,0.2); }
+    .stat-icon.green { background: rgba(39,174,96,0.2); }
+
+    .stat-info span { display:block; font-size:26px; font-weight:900; color:var(--text); line-height:1; }
+    .stat-info p    { font-size:12px; color:var(--muted); margin-top:3px; }
+
+    /* Contractor Section */
+    .contractor-section { display:none; margin-bottom:28px; }
+
+    .contractor-box {
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 16px; padding: 22px 28px;
+      backdrop-filter: blur(8px);
+      display: flex; align-items:center;
+      justify-content: space-between; flex-wrap:wrap; gap:16px;
     }
 
-    .stat-icon.blue   { background: rgba(15,52,96,0.6); }
-    .stat-icon.red    { background: rgba(233,69,96,0.2); }
-    .stat-icon.green  { background: rgba(39,174,96,0.2); }
+    .contractor-label-title { font-size:16px; font-weight:800; margin-bottom:4px; }
 
-    .stat-info span {
-      display: block;
-      font-size: 26px;
-      font-weight: 900;
-      color: var(--text);
-      line-height: 1;
+    .contractor-status { font-size:12px; color:var(--muted); font-weight:600; }
+    .contractor-status.has-record { color:#2ecc71; }
+
+    .contractor-controls { display:flex; align-items:center; gap:10px; }
+
+    .contractor-input {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 10px; padding: 10px 14px;
+      color: var(--text); font-family:'Cairo',sans-serif;
+      font-size:15px; font-weight:700; width:160px;
+      outline:none; text-align:center; transition: border-color 0.2s;
     }
+    .contractor-input:focus { border-color: rgba(39,174,96,0.5); }
 
-    .stat-info p {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 3px;
+    .contractor-save-btn {
+      background: linear-gradient(135deg, #27ae60, #2ecc71);
+      color:white; border:none; border-radius:10px;
+      padding:11px 22px; font-family:'Cairo',sans-serif;
+      font-size:14px; font-weight:700; cursor:pointer;
+      box-shadow: 0 4px 14px rgba(39,174,96,0.35); transition: all 0.25s;
     }
+    .contractor-save-btn:hover { transform:translateY(-2px); box-shadow:0 6px 20px rgba(39,174,96,0.5); }
+    .contractor-save-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
 
-    /* ── Toolbar ── */
+    /* Toolbar */
     .toolbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-bottom: 22px;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:14px; margin-bottom:22px;
     }
-
-    .toolbar-title {
-      font-size: 18px;
-      font-weight: 800;
-    }
-
-    .toolbar-title span {
-      color: var(--gold);
-    }
-
-    /* ✅ عناصر الفلاتر */
-    .toolbar-filters {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-wrap: wrap;
-    }
+    .toolbar-title { font-size:18px; font-weight:800; }
+    .toolbar-title span { color:var(--gold); }
+    .toolbar-filters { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 
     .search-box {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 16px;
-      min-width: 260px;
-      backdrop-filter: blur(8px);
+      display:flex; align-items:center; gap:10px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius:10px; padding:10px 16px;
+      min-width:260px; backdrop-filter:blur(8px);
     }
-
     .search-box input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text);
-      font-family: 'Cairo', sans-serif;
-      font-size: 14px;
-      width: 100%;
+      background:transparent; border:none; outline:none;
+      color:var(--text); font-family:'Cairo',sans-serif;
+      font-size:14px; width:100%;
     }
-
-    .search-box input::placeholder { color: var(--muted); }
-    .search-icon { color: var(--muted); font-size: 16px; }
+    .search-box input::placeholder { color:var(--muted); }
+    .search-icon { color:var(--muted); font-size:16px; }
 
     .select-box {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 8px 12px;
-      color: var(--text);
-      font-family: 'Cairo', sans-serif;
-      font-size: 14px;
-      min-width: 160px;
-      backdrop-filter: blur(8px);
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius:10px; padding:8px 12px; color:var(--text);
+      font-family:'Cairo',sans-serif; font-size:14px;
+      min-width:160px; backdrop-filter:blur(8px);
     }
+    .select-box option { background-color:#1a1a2e; color:#ffffff; }
+    .select-box option:checked { background-color:#e94560; }
 
-    /* ── Table ── */
+    /* Table */
     .table-wrap {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      overflow: hidden;
-      backdrop-filter: blur(8px);
+      background: var(--card-bg); border:1px solid var(--border);
+      border-radius:16px; overflow:hidden; backdrop-filter:blur(8px);
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    thead tr {
-      background: rgba(15,52,96,0.5);
-    }
-
+    table { width:100%; border-collapse:collapse; }
+    thead tr { background: rgba(15,52,96,0.5); }
     thead th {
-      padding: 16px 20px;
-      text-align: right;
-      font-size: 12px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      color: var(--light);
-      border-bottom: 1px solid var(--border);
+      padding:16px 20px; text-align:right;
+      font-size:12px; font-weight:700;
+      text-transform:uppercase; letter-spacing:0.8px;
+      color:var(--light); border-bottom:1px solid var(--border);
     }
-
-    tbody tr {
-      border-bottom: 1px solid var(--border);
-      transition: background 0.2s;
-    }
-
-    tbody tr:last-child { border-bottom: none; }
-
-    tbody tr:hover { background: rgba(255,255,255,0.04); }
-
-    tbody td {
-      padding: 15px 20px;
-      font-size: 14px;
-      color: var(--text);
-    }
+    tbody tr { border-bottom:1px solid var(--border); transition:background 0.2s; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:rgba(255,255,255,0.04); }
+    tbody td { padding:15px 20px; font-size:14px; color:var(--text); }
 
     .id-cell {
-      font-family: monospace;
-      font-size: 13px;
-      color: var(--light);
-      background: rgba(168,218,220,0.1);
-      padding: 4px 10px;
-      border-radius: 6px;
-      display: inline-block;
+      font-family:monospace; font-size:13px; color:var(--light);
+      background:rgba(168,218,220,0.1); padding:4px 10px;
+      border-radius:6px; display:inline-block;
     }
-
     .shift-cell {
-      font-family: monospace;
-      font-size: 13px;
-      color: #ffd6dc;
-      background: rgba(233,69,96,0.12);
-      padding: 4px 10px;
-      border-radius: 6px;
-      display: inline-block;
+      font-family:monospace; font-size:13px; color:#ffd6dc;
+      background:rgba(233,69,96,0.12); padding:4px 10px;
+      border-radius:6px; display:inline-block;
     }
-
-    .name-cell { font-weight: 600; }
-
+    .name-cell { font-weight:600; }
     .dept-cell {
-      font-size: 12px;
-      color: var(--muted);
-      background: rgba(255,255,255,0.05);
-      padding: 4px 10px;
-      border-radius: 20px;
-      display: inline-block;
+      font-size:12px; color:var(--muted);
+      background:rgba(255,255,255,0.05); padding:4px 10px;
+      border-radius:20px; display:inline-block;
     }
+    .row-num { color:var(--muted); font-size:13px; }
 
-    .row-num {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    /* ── States ── */
-    .state-box {
-      text-align: center;
-      padding: 60px 20px;
-      color: var(--muted);
-    }
-
-    .state-box .icon { font-size: 48px; margin-bottom: 14px; }
-
-    .state-box p {
-      font-size: 15px;
-      margin-bottom: 6px;
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .state-box small { font-size: 13px; }
+    .state-box { text-align:center; padding:60px 20px; color:var(--muted); }
+    .state-box .icon { font-size:48px; margin-bottom:14px; }
+    .state-box p { font-size:15px; margin-bottom:6px; color:var(--text); font-weight:600; }
+    .state-box small { font-size:13px; }
 
     .spinner-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 14px;
-      padding: 60px 20px;
-      color: var(--muted);
+      display:flex; align-items:center; justify-content:center;
+      gap:14px; padding:60px 20px; color:var(--muted);
     }
-
     .spin {
-      width: 32px; height: 32px;
-      border: 3px solid rgba(255,255,255,0.1);
-      border-top-color: var(--gold);
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
+      width:32px; height:32px;
+      border:3px solid rgba(255,255,255,0.1);
+      border-top-color:var(--gold);
+      border-radius:50%; animation:spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .no-results { text-align:center; padding:40px; color:var(--muted); font-size:14px; display:none; }
+
+    .cb-wrap { display:flex; align-items:center; justify-content:center; }
+    input[type="checkbox"] { width:18px; height:18px; accent-color:var(--gold); cursor:pointer; }
+
+    tbody tr.selected-row  { background:rgba(233,69,96,0.08) !important; border-right:3px solid var(--gold); }
+    tbody tr.already-added { opacity:0.45; pointer-events:none; }
+
+    .added-badge {
+      display:inline-block;
+      background:rgba(39,174,96,0.2); color:#2ecc71;
+      border:1px solid rgba(39,174,96,0.4);
+      padding:2px 10px; border-radius:20px;
+      font-size:11px; font-weight:700; margin-right:8px;
     }
 
-    @keyframes spin { to { transform: rotate(360deg); } }
-
-    /* ── No results (filtered) ── */
-    .no-results {
-      text-align: center;
-      padding: 40px;
-      color: var(--muted);
-      font-size: 14px;
-      display: none;
-    }
-
-    /* ── Checkbox ── */
-    .cb-wrap {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    input[type="checkbox"] {
-      width: 18px;
-      height: 18px;
-      accent-color: var(--gold);
-      cursor: pointer;
-      border-radius: 4px;
-    }
-
-    tbody tr.selected-row {
-      background: rgba(233,69,96,0.08) !important;
-      border-right: 3px solid var(--gold);
-    }
-
-    /* ── Selected Panel ── */
-    .selected-panel {
-      margin-top: 32px;
-      display: none;
-    }
-
+    /* Selected Panel */
+    .selected-panel { margin-top:32px; display:none; }
     .selected-panel-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 16px;
+      display:flex; align-items:center; justify-content:space-between;
+      flex-wrap:wrap; gap:12px; margin-bottom:16px;
     }
-
-    .selected-title {
-      font-size: 17px;
-      font-weight: 800;
-    }
-
-    .selected-title span { color: var(--gold); }
+    .selected-title { font-size:17px; font-weight:800; }
+    .selected-title span { color:var(--gold); }
 
     .save-btn {
       background: linear-gradient(135deg, #27ae60, #2ecc71);
-      color: white;
-      border: none;
-      padding: 12px 28px;
-      border-radius: 10px;
-      font-family: 'Cairo', sans-serif;
-      font-size: 14px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.25s;
-      box-shadow: 0 4px 15px rgba(39,174,96,0.35);
+      color:white; border:none; padding:12px 28px; border-radius:10px;
+      font-family:'Cairo',sans-serif; font-size:14px; font-weight:700;
+      cursor:pointer; transition:all 0.25s;
+      box-shadow:0 4px 15px rgba(39,174,96,0.35);
     }
-
-    .save-btn:hover:not(:disabled) {
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(39,174,96,0.5);
-    }
-
-    .save-btn:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-      transform: none;
-    }
+    .save-btn:hover:not(:disabled) { transform:translateY(-2px); box-shadow:0 6px 20px rgba(39,174,96,0.5); }
+    .save-btn:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
 
     .clear-btn {
-      background: rgba(233,69,96,0.1);
-      border: 1px solid rgba(233,69,96,0.3);
-      color: var(--gold);
-      padding: 10px 20px;
-      border-radius: 10px;
-      font-family: 'Cairo', sans-serif;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.25s;
+      background:rgba(233,69,96,0.1); border:1px solid rgba(233,69,96,0.3);
+      color:var(--gold); padding:10px 20px; border-radius:10px;
+      font-family:'Cairo',sans-serif; font-size:13px; font-weight:600;
+      cursor:pointer; transition:all 0.25s;
     }
+    .clear-btn:hover { background:var(--gold); color:white; }
 
-    .clear-btn:hover {
-      background: var(--gold);
-      color: white;
-    }
-
-    /* ── Toast ── */
+    /* Toast */
     .toast {
-      position: fixed;
-      bottom: 30px;
-      left: 50%;
-      transform: translateX(-50%) translateY(80px);
-      background: #27ae60;
-      color: white;
-      padding: 14px 28px;
-      border-radius: 12px;
-      font-size: 14px;
-      font-weight: 700;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-      z-index: 999;
-      transition: transform 0.35s ease;
-      white-space: nowrap;
+      position:fixed; bottom:30px; left:50%;
+      transform:translateX(-50%) translateY(80px);
+      background:#27ae60; color:white;
+      padding:14px 28px; border-radius:12px;
+      font-size:14px; font-weight:700;
+      box-shadow:0 8px 30px rgba(0,0,0,0.3);
+      z-index:999; transition:transform 0.35s ease; white-space:nowrap;
     }
+    .toast.show  { transform:translateX(-50%) translateY(0); }
+    .toast.error { background:#e74c3c; }
 
-    .toast.show { transform: translateX(-50%) translateY(0); }
-    .toast.error { background: #e74c3c; }
-    .toast.warning { background: #f39c12; }
-
-    /* ── Already Added Today ── */
-    tbody tr.already-added {
-      opacity: 0.45;
-      pointer-events: none;
+    @media (max-width:700px) {
+      header { padding:16px 20px; }
+      main   { padding:20px 16px; }
+      .toolbar { flex-direction:column; align-items:flex-start; }
+      .toolbar-filters { width:100%; }
+      .search-box { min-width:0; flex:1; }
+      .select-box { width:100%; }
+      .contractor-box { flex-direction:column; align-items:flex-start; }
+      .contractor-controls { width:100%; }
+      .contractor-input { flex:1; width:auto; }
     }
-
-    tbody tr.already-added .cb-wrap input {
-      cursor: not-allowed;
-    }
-
-    .added-badge {
-      display: inline-block;
-      background: rgba(39,174,96,0.2);
-      color: #2ecc71;
-      border: 1px solid rgba(39,174,96,0.4);
-      padding: 2px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      margin-right: 8px;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 700px) {
-      header  { padding: 16px 20px; }
-      main    { padding: 20px 16px; }
-      .toolbar { flex-direction: column; align-items: flex-start; }
-      .toolbar-filters { width: 100%; }
-      .search-box { min-width: 0; flex:1; }
-      .select-box { width: 100%; }
-    }
-/* إصلاح مشكلة عناصر القائمة المنسدلة */
-.select-box option {
-  background-color: #1a1a2e !important; /* غامق عشان يبقى واضح */
-  color: #ffffff !important;            /* نص أبيض واضح */
-  padding: 8px;
-}
-
-/* عند الوقوف على العنصر (Hover) */
-.select-box option:hover,
-.select-box option:checked {
-  background-color: #e94560 !important;
-  color: #fff !important;
-}
   </style>
 </head>
 <body>
 
-<!-- ===== HEADER ===== -->
 <header>
   <div class="header-left">
     <div class="logo-icon">🏢</div>
@@ -550,7 +332,6 @@
       <p id="headerSub">جاري التحميل...</p>
     </div>
   </div>
-
   <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
     <div class="dept-badge" id="deptBadge">—</div>
     <div class="user-info">
@@ -564,49 +345,44 @@
   </div>
 </header>
 
-<!-- ===== MAIN ===== -->
 <main>
 
-  <!-- Stats -->
   <div class="stats-bar">
     <div class="stat-card">
       <div class="stat-icon blue">👥</div>
-      <div class="stat-info">
-        <span id="statTotal">—</span>
-        <p>إجمالي الموظفين</p>
-      </div>
+      <div class="stat-info"><span id="statTotal">—</span><p>إجمالي الموظفين</p></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon red">🏷️</div>
-      <div class="stat-info">
-        <span id="statDept">—</span>
-        <p>الإدارة</p>
-      </div>
+      <div class="stat-info"><span id="statDept">—</span><p>الإدارة</p></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon green">🔍</div>
-      <div class="stat-info">
-        <span id="statFiltered">—</span>
-        <p>نتائج البحث</p>
-      </div>
+      <div class="stat-info"><span id="statFiltered">—</span><p>نتائج البحث</p></div>
     </div>
     <div class="stat-card">
       <div class="stat-icon" style="background:rgba(233,69,96,0.2)">✅</div>
-      <div class="stat-info">
-        <span id="statSelected">0</span>
-        <p>المختارون</p>
+      <div class="stat-info"><span id="statSelected">0</span><p>المختارون</p></div>
+    </div>
+  </div>
+
+  <!-- Contractor Section — Administration Only -->
+  <div class="contractor-section" id="contractorSection">
+    <div class="contractor-box">
+      <div>
+        <div class="contractor-label-title">👷 عدد المقاولين اليوم</div>
+        <div class="contractor-status" id="contractorStatus">جاري التحميل...</div>
+      </div>
+      <div class="contractor-controls">
+        <input type="number" id="contractorCount" class="contractor-input" min="0" placeholder="أدخل العدد">
+        <button class="contractor-save-btn" id="contractorSaveBtn" onclick="saveContractor()">💾 حفظ</button>
       </div>
     </div>
   </div>
 
-  <!-- Toolbar -->
   <div class="toolbar">
-    <div class="toolbar-title">
-      موظفو إدارة <span id="toolbarDept">...</span>
-    </div>
-
+    <div class="toolbar-title">موظفو إدارة <span id="toolbarDept">...</span></div>
     <div class="toolbar-filters">
-      <!-- 🔽 Shift Filter -->
       <select id="shiftFilter" class="select-box" onchange="applyFilters()">
         <option value="">كل الورديات</option>
         <option value="Dayshift">Dayshift</option>
@@ -615,8 +391,6 @@
         <option value="C">C</option>
         <option value="D">D</option>
       </select>
-
-      <!-- 🔎 Text Search -->
       <div class="search-box">
         <span class="search-icon">🔎</span>
         <input type="text" id="searchInput"
@@ -626,19 +400,16 @@
     </div>
   </div>
 
-  <!-- Table -->
   <div class="table-wrap" id="tableWrap">
     <div class="spinner-wrap" id="loadingState">
       <div class="spin"></div>
       <span>جاري تحميل بيانات الموظفين...</span>
     </div>
-
     <div class="state-box" id="errorState" style="display:none">
       <div class="icon">⚠️</div>
       <p>تعذّر تحميل البيانات</p>
       <small id="errorMsg"></small>
     </div>
-
     <table id="empTable" style="display:none">
       <thead>
         <tr>
@@ -649,43 +420,30 @@
           </th>
           <th style="width:50px">#</th>
           <th>الرقم الوظيفي</th>
-          <th>الوردية</th> <!-- ✅ عمود الشيفت كود -->
+          <th>الوردية</th>
           <th>الاسم الكامل</th>
           <th>الإدارة</th>
         </tr>
       </thead>
       <tbody id="empBody"></tbody>
     </table>
-
-    <div class="no-results" id="noResults">
-      لا توجد نتائج تطابق بحثك 🔍
-    </div>
+    <div class="no-results" id="noResults">لا توجد نتائج تطابق بحثك 🔍</div>
   </div>
 
-  <!-- ===== SELECTED PANEL ===== -->
   <div class="selected-panel" id="selectedPanel">
     <div class="selected-panel-header">
-      <div class="selected-title">
-        الموظفون المختارون &nbsp;<span id="selectedCount">0</span>
-      </div>
+      <div class="selected-title">الموظفون المختارون &nbsp;<span id="selectedCount">0</span></div>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="clear-btn" onclick="clearSelection()">🗑️ مسح الاختيار</button>
-        <button class="save-btn" id="saveBtn" onclick="saveOrders()">
-          💾 حفظ في Orders
-        </button>
+        <button class="save-btn" id="saveBtn" onclick="saveOrders()">💾 حفظ في Orders</button>
       </div>
     </div>
-
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>الرقم الوظيفي</th>
-            <th>الوردية</th>
-            <th>الاسم الكامل</th>
-            <th>الإدارة</th>
-            <th>التاريخ</th>
+            <th>#</th><th>الرقم الوظيفي</th><th>الوردية</th>
+            <th>الاسم الكامل</th><th>الإدارة</th><th>التاريخ</th>
           </tr>
         </thead>
         <tbody id="selectedBody"></tbody>
@@ -695,20 +453,18 @@
 
 </main>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
-  // ============================================================
-  // ⚙️ الإعدادات
-  // ============================================================
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxFhhA5mG-jPSexRF0hQk-qJ6vB4JuzPcDxy1UQDHv6MP4asgYGWt2FMahmpWEm2JCPsg/exec';
-  // ============================================================
+  const SCRIPT_URL     = 'https://script.google.com/macros/s/AKfycbxFhhA5mG-jPSexRF0hQk-qJ6vB4JuzPcDxy1UQDHv6MP4asgYGWt2FMahmpWEm2JCPsg/exec';
+  const CONTRACTOR_URL = 'https://script.google.com/macros/s/AKfycbw7yJo25YWoIpzO5fw_WlOxzF6qytA8AxqIfgfXC_o6MsGwMLGbORkQa0zQ93rNJsNs6Q/exec';
 
-  let allEmployees  = [];
-  let filteredEmps  = [];
-  let selectedEmps  = new Map(); // key: unique employee ID
-  let todayNames    = new Set();
+  let allEmployees       = [];
+  let filteredEmps       = [];
+  let selectedEmps       = new Map();
+  let todayNames         = new Set();
+  let contractorRowIndex = null;
+
   const TODAY_STR = new Date().toISOString().split('T')[0];
 
   const rawUser = sessionStorage.getItem('currentUser');
@@ -728,9 +484,117 @@
   document.getElementById('headerSub').textContent     = `إدارة ${user.Department || ''}`;
   document.getElementById('avatarInitial').textContent = (user.User_Name || 'A').charAt(0).toUpperCase();
 
-  // ============================================================
-  // تحميل الموظفين + المضافين اليوم
-  // ============================================================
+  if ((user.Department || '').trim() === 'Administration') {
+    document.getElementById('contractorSection').style.display = 'block';
+  }
+
+  // ── Contractor: تحميل ──
+  async function loadContractor() {
+    const statusEl = document.getElementById('contractorStatus');
+    statusEl.textContent = 'جاري التحميل...';
+    statusEl.className   = 'contractor-status';
+
+    try {
+      const res = await fetch(CONTRACTOR_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ action: 'get_contractor', date: TODAY_STR })
+      });
+      const result = await res.json();
+
+      if (result.ok && result.quantity !== null) {
+        document.getElementById('contractorCount').value = result.quantity;
+        contractorRowIndex   = result.rowIndex;
+        statusEl.textContent = `✓ تم تسجيل ${result.quantity} مقاول اليوم — يمكنك التعديل أو الحذف`;
+        statusEl.className   = 'contractor-status has-record';
+      } else {
+        contractorRowIndex   = null;
+        statusEl.textContent = 'لم يتم تسجيل أي عدد اليوم بعد';
+        statusEl.className   = 'contractor-status';
+      }
+    } catch(err) {
+      statusEl.textContent = 'تعذّر تحميل البيانات';
+      statusEl.className   = 'contractor-status';
+    }
+  }
+
+  // ── Contractor: حفظ / تعديل / حذف ──
+  async function saveContractor() {
+    const val      = document.getElementById('contractorCount').value.trim();
+    const btn      = document.getElementById('contractorSaveBtn');
+    const statusEl = document.getElementById('contractorStatus');
+
+    btn.disabled    = true;
+    btn.textContent = '⏳ جاري الحفظ...';
+
+    try {
+      let result;
+
+      // حذف: الحقل فاضي + فيه سجل
+      if (val === '' && contractorRowIndex) {
+        const res = await fetch(CONTRACTOR_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ action: 'delete_contractor', rowIndex: contractorRowIndex })
+        });
+        result = await res.json();
+        if (result.ok) {
+          contractorRowIndex   = null;
+          statusEl.textContent = 'لم يتم تسجيل أي عدد اليوم بعد';
+          statusEl.className   = 'contractor-status';
+          showToast('🗑️ تم حذف السجل');
+        }
+
+      // تعديل: فيه سجل موجود
+      } else if (contractorRowIndex) {
+        if (!val || isNaN(val) || Number(val) < 0) {
+          showToast('⚠️ أدخل عدداً صحيحاً', true); return;
+        }
+        const res = await fetch(CONTRACTOR_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ action: 'update_contractor', rowIndex: contractorRowIndex, quantity: val })
+        });
+        result = await res.json();
+        if (result.ok) {
+          statusEl.textContent = `✓ تم تسجيل ${val} مقاول اليوم — يمكنك التعديل أو الحذف`;
+          statusEl.className   = 'contractor-status has-record';
+          showToast('✅ تم تعديل عدد المقاولين');
+        }
+
+      // إضافة جديدة
+      } else {
+        if (!val || isNaN(val) || Number(val) < 0) {
+          showToast('⚠️ أدخل عدداً صحيحاً', true); return;
+        }
+        const res = await fetch(CONTRACTOR_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            action: 'save_contractor',
+            date: TODAY_STR,
+            submitted_by: user.User_Name,
+            quantity: val
+          })
+        });
+        result = await res.json();
+        if (result.ok) {
+          await loadContractor();
+          showToast('✅ تم حفظ عدد المقاولين');
+        }
+      }
+
+      if (result && !result.ok) showToast('❌ ' + (result.message || result.error), true);
+
+    } catch(err) {
+      showToast('❌ خطأ: ' + err.message, true);
+    }
+
+    btn.disabled    = false;
+    btn.textContent = '💾 حفظ';
+  }
+
+  // ── Employees ──
   async function loadEmployees() {
     try {
       todayNames.clear();
@@ -739,20 +603,12 @@
         fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            action: 'get_employees',
-            department: user.Department,
-            today: TODAY_STR
-          })
+          body: new URLSearchParams({ action: 'get_employees', department: user.Department, today: TODAY_STR })
         }),
         fetch(SCRIPT_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: new URLSearchParams({
-            action: 'get_today_orders',
-            today: TODAY_STR,
-            department: user.Department
-          })
+          body: new URLSearchParams({ action: 'get_today_orders', today: TODAY_STR, department: user.Department })
         })
       ]);
 
@@ -762,8 +618,7 @@
       document.getElementById('loadingState').style.display = 'none';
 
       if (!empResult.ok) {
-        document.getElementById('errorMsg').textContent =
-          empResult.message || empResult.error || 'خطأ غير معروف';
+        document.getElementById('errorMsg').textContent = empResult.message || empResult.error || 'خطأ غير معروف';
         document.getElementById('errorState').style.display = 'block';
         return;
       }
@@ -772,31 +627,24 @@
         todayResult.names.forEach(n => todayNames.add(n.trim().toLowerCase()));
       }
 
-      // 🧠 تأكيد الحقول + دعم تسميات مختلفة للوردية
       allEmployees = (empResult.employees || []).map(e => ({
-        id:   String(e.id   ?? '').trim(),
-        name: String(e.name ?? '').trim(),
-        dept: String(e.dept ?? '').trim(),
+        id:    String(e.id    ?? '').trim(),
+        name:  String(e.name  ?? '').trim(),
+        dept:  String(e.dept  ?? '').trim(),
         shift: String((e.shift ?? e.shift_code ?? e.Shift_Code ?? '')).trim()
       }));
 
       document.getElementById('statTotal').textContent = allEmployees.length;
-
-      // تطبيق الفلاتر المبدئية
       applyFilters();
-
       document.getElementById('empTable').style.display = 'table';
 
-    } catch (err) {
+    } catch(err) {
       document.getElementById('loadingState').style.display = 'none';
       document.getElementById('errorMsg').textContent = err.message;
       document.getElementById('errorState').style.display = 'block';
     }
   }
 
-  // ============================================================
-  // رسم الجدول
-  // ============================================================
   function renderTable(employees) {
     const tbody = document.getElementById('empBody');
     tbody.innerHTML = '';
@@ -813,34 +661,27 @@
     employees.forEach((emp, i) => {
       const isChecked = selectedEmps.has(emp.id);
       const isAdded   = todayNames.has((emp.name || '').trim().toLowerCase());
-
-      const tr = document.createElement('tr');
+      const tr        = document.createElement('tr');
 
       if (isChecked) tr.classList.add('selected-row');
       if (isAdded)   tr.classList.add('already-added');
 
-      const safeName = (emp.name || '').replace(/'/g,"\\'");
+      const safeName = (emp.name || '').replace(/'/g, "\\'");
 
       tr.innerHTML = `
-        <td>
-          <div class="cb-wrap">
-            <input type="checkbox"
-              data-id="${emp.id}"
-              ${isChecked ? 'checked' : ''}
-              ${isAdded ? 'disabled' : ''}
-              onchange="toggleEmployee(this,'${emp.id}','${safeName}','${emp.dept}','${emp.shift || ''}')">
-          </div>
-        </td>
+        <td><div class="cb-wrap">
+          <input type="checkbox" data-id="${emp.id}"
+            ${isChecked ? 'checked' : ''} ${isAdded ? 'disabled' : ''}
+            onchange="toggleEmployee(this,'${emp.id}','${safeName}','${emp.dept}','${emp.shift || ''}')">
+        </div></td>
         <td class="row-num">${i + 1}</td>
         <td><span class="id-cell">${emp.id}</span></td>
         <td><span class="shift-cell">${emp.shift || ''}</span></td>
         <td class="name-cell">
-          ${isAdded ? '<span class="added-badge">✓ مضاف</span>' : ''}
-          ${emp.name}
+          ${isAdded ? '<span class="added-badge">✓ مضاف</span>' : ''}${emp.name}
         </td>
         <td><span class="dept-cell">${emp.dept}</span></td>
       `;
-
       tbody.appendChild(tr);
     });
 
@@ -850,7 +691,6 @@
 
   function toggleEmployee(cb, id, name, dept, shift) {
     const tr = cb.closest('tr');
-
     if (cb.checked) {
       selectedEmps.set(id, { id, name, dept, shift });
       tr.classList.add('selected-row');
@@ -858,21 +698,17 @@
       selectedEmps.delete(id);
       tr.classList.remove('selected-row');
     }
-
     updateSelectedPanel();
     syncSelectAll();
   }
 
   function toggleSelectAll(cb) {
-    const rows = document.querySelectorAll('#empBody tr:not(.already-added)');
-
-    rows.forEach(tr => {
+    document.querySelectorAll('#empBody tr:not(.already-added)').forEach(tr => {
       const rowCb = tr.querySelector('input[type="checkbox"]');
       const id    = rowCb.dataset.id;
       const name  = tr.querySelector('.name-cell').innerText.trim().replace(/^✓ مضاف\s*/, '');
       const dept  = tr.querySelector('.dept-cell').innerText.trim();
       const shift = tr.querySelector('.shift-cell').innerText.trim();
-
       if (cb.checked) {
         rowCb.checked = true;
         selectedEmps.set(id, { id, name, dept, shift });
@@ -883,37 +719,27 @@
         tr.classList.remove('selected-row');
       }
     });
-
     updateSelectedPanel();
   }
 
   function syncSelectAll() {
-    const visibleIds = [...document.querySelectorAll('#empBody tr:not(.already-added) input[type="checkbox"]')]
-      .map(cb => cb.dataset.id);
-
+    const visibleIds  = [...document.querySelectorAll('#empBody tr:not(.already-added) input[type="checkbox"]')].map(cb => cb.dataset.id);
     const allChecked  = visibleIds.length > 0 && visibleIds.every(id => selectedEmps.has(id));
     const someChecked = visibleIds.some(id => selectedEmps.has(id));
-
     const cb = document.getElementById('selectAll');
-    if (cb) {
-      cb.checked = allChecked;
-      cb.indeterminate = !allChecked && someChecked;
-    }
+    if (cb) { cb.checked = allChecked; cb.indeterminate = !allChecked && someChecked; }
   }
 
   function updateSelectedPanel() {
     const count = selectedEmps.size;
-
-    document.getElementById('statSelected').textContent = count;
+    document.getElementById('statSelected').textContent  = count;
     document.getElementById('selectedCount').textContent = count;
     document.getElementById('selectedPanel').style.display = count > 0 ? 'block' : 'none';
 
     const tbody = document.getElementById('selectedBody');
     tbody.innerHTML = '';
-
     let i = 1;
-    const list = Array.from(selectedEmps.values());
-    list.forEach(emp => {
+    selectedEmps.forEach(emp => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="row-num">${i++}</td>
@@ -937,32 +763,23 @@
     syncSelectAll();
   }
 
-  // ============================================================
-  // حفظ في Orders (مع إعادة تحميل بعد النجاح)
-  // ============================================================
   async function saveOrders() {
     if (selectedEmps.size === 0) return;
 
     const saveBtn = document.getElementById('saveBtn');
-    saveBtn.disabled = true;
+    saveBtn.disabled  = true;
     saveBtn.innerHTML = '⏳ جاري الحفظ...';
 
     const rows = [];
-
     selectedEmps.forEach(emp => {
       const empName = (emp.name || '').trim();
-      if (!empName) return; // فاليديشن على الاسم فقط
-      rows.push({
-        date: TODAY_STR,
-        submitted_by: user.User_Name,
-        employee: empName,
-        department: emp.dept
-      });
+      if (!empName) return;
+      rows.push({ date: TODAY_STR, submitted_by: user.User_Name, employee: empName, department: emp.dept });
     });
 
     if (rows.length === 0) {
-      showToast('⚠️ لا توجد صفوف صالحة للحفظ (الأسماء مطلوبة)', true);
-      saveBtn.disabled = false;
+      showToast('⚠️ لا توجد صفوف صالحة للحفظ', true);
+      saveBtn.disabled  = false;
       saveBtn.innerHTML = '💾 حفظ في Orders';
       return;
     }
@@ -971,43 +788,33 @@
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: new URLSearchParams({
-          action: 'save_orders',
-          rows: JSON.stringify(rows)
-        })
+        body: new URLSearchParams({ action: 'save_orders', rows: JSON.stringify(rows) })
       });
-
       const result = await res.json();
-
       if (result.ok) {
         showToast(`✅ تم الحفظ بنجاح (${rows.length})`);
         clearSelection();
-        await loadEmployees(); // إعادة تحميل بعد النجاح
+        await loadEmployees();
       } else {
         showToast('❌ فشل الحفظ: ' + (result.message || result.error), true);
       }
-
-    } catch (err) {
+    } catch(err) {
       showToast('❌ خطأ في الاتصال: ' + err.message, true);
     }
 
-    saveBtn.disabled = false;
+    saveBtn.disabled  = false;
     saveBtn.innerHTML = '💾 حفظ في Orders';
   }
 
-  // ============================================================
-  // الفلاتر: نص + وردية (Day/A/B/C/D)
-  // ============================================================
   function applyFilters() {
-    const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
-    const shiftValue = document.getElementById('shiftFilter').value; // '', 'Day', 'A', 'B', 'C', 'D'
+    const q          = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    const shiftValue = document.getElementById('shiftFilter').value;
 
     filteredEmps = allEmployees.filter(e => {
-      const nameMatch  = (e.name || '').toLowerCase().includes(q);
-      const idMatch    = (e.id   || '').toLowerCase().includes(q);
-      const shiftText  = (e.shift|| '').toLowerCase();
-      const shiftTextMatch = shiftText.includes(q);     // بحث بالنص
-      const shiftFilterMatch = !shiftValue || (e.shift === shiftValue); // فلتر الدروبلست
+      const nameMatch        = (e.name  || '').toLowerCase().includes(q);
+      const idMatch          = (e.id    || '').toLowerCase().includes(q);
+      const shiftTextMatch   = (e.shift || '').toLowerCase().includes(q);
+      const shiftFilterMatch = !shiftValue || (e.shift === shiftValue);
       return (nameMatch || idMatch || shiftTextMatch) && shiftFilterMatch;
     });
 
@@ -1017,7 +824,7 @@
   function showToast(msg, isError = false) {
     const t = document.getElementById('toast');
     t.textContent = msg;
-    t.className = 'toast' + (isError ? ' error' : '');
+    t.className   = 'toast' + (isError ? ' error' : '');
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3500);
   }
@@ -1027,8 +834,8 @@
     window.location.assign('index.html');
   }
 
-  // بدء التحميل
   loadEmployees();
+  if ((user.Department || '').trim() === 'Administration') loadContractor();
 </script>
 
 </body>
