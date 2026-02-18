@@ -576,10 +576,10 @@
         البيانات الأساسية
       </div>
       <div class="fields-grid">
-        <div class="field-group">
-          <div class="field-label">التاريخ</div>
-          <input type="date" id="dateInput" class="field-input">
-        </div>
+<div class="field-group">
+  <div class="field-label">التاريخ</div>
+  <input type="text" id="dateInput" class="field-input" readonly>
+</div>
         <div class="field-group">
           <div class="field-label">اليوم</div>
           <input type="text" id="dayLabel" class="field-input" readonly>
@@ -882,12 +882,10 @@ function dayNameAr(ds) {
   sel.innerHTML = `<option value="" disabled selected>اختر القسم</option>` +
     DEPARTMENTS.map(d => `<option>${d}</option>`).join("");
 
-  const dateEl = document.getElementById("dateInput");
-  dateEl.value = todayStr();
-  document.getElementById("dayLabel").value = dayNameAr(dateEl.value);
-  dateEl.addEventListener("change", () => {
-    document.getElementById("dayLabel").value = dayNameAr(dateEl.value);
-  });
+const dateEl = document.getElementById("dateInput");
+dateEl.value = todayStr();
+document.getElementById("dayLabel").value = dayNameAr(todayStr());
+
 
   // Fill analytics dept too
   const asel = document.getElementById("analyticsDept");
