@@ -115,7 +115,23 @@
     padding-top: 10px;
   }
 
-  /* ===== Buttons ===== */
+  /* ===== Buttons & Toolbar ===== */
+  .toolbar {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:24px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .left-group,
+  .right-group {
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+
   .print-btn {
     padding: 10px 32px;
     background: #1a1a2e;
@@ -141,6 +157,30 @@
     cursor: pointer;
   }
   .logout-btn:hover { background: #c0392b; color: #fff; }
+
+  /* === NEW: إجمالي الأشخاص === */
+  .total-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #eef6ff;
+    color: #0b5cab;
+    border: 1px solid #b8d6ff;
+    padding: 8px 12px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1;
+    white-space: nowrap;
+  }
+  .total-badge .dot {
+    width: 8px;
+    height: 8px;
+    background: #0b5cab;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 4px;
+  }
 
   /* ===== Print Styles ===== */
   @media print {
@@ -204,9 +244,20 @@
 </div>
 
 <!-- أزرار الشاشة فقط -->
-<div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
-  <button class="print-btn" onclick="window.print()">🖨️ طباعة</button>
-  <button class="logout-btn" onclick="window.location.href='index.html'">🚪 تسجيل الخروج</button>
+<div class="no-print toolbar">
+  <div class="right-group">
+    <button class="print-btn" onclick="window.print()">🖨️ طباعة</button>
+
+    <!-- === NEW: ليبُل إجمالي الأشخاص === -->
+    <div class="total-badge" id="totalCount" title="إجمالي عدد الأشخاص لجميع الإدارات">
+      <span class="dot" aria-hidden="true"></span>
+      <span>الإجمالي: 0</span>
+    </div>
+  </div>
+
+  <div class="left-group">
+    <button class="logout-btn" onclick="window.location.href='index.html'">🚪 تسجيل الخروج</button>
+  </div>
 </div>
 
 <div id="loadingMsg">⏳ جاري تحميل البيانات...</div>
@@ -249,13 +300,21 @@
 
       if (!data.ok) throw new Error(data.error || "خطأ في البيانات");
 
+      // تصفية طلبات اليوم فقط
       const todayOrders = data.orders.filter(o => o.date === todayStr);
 
+      // تحديث واجهة التحميل
       document.getElementById('loadingMsg').style.display = 'none';
+
+      // === NEW: تحديث ليبُل الإجمالي ===
+      const totalLabel = document.getElementById('totalCount');
+      totalLabel.textContent = `الإجمالي: ${todayOrders.length}`;
 
       if (todayOrders.length === 0) {
         document.getElementById('tablesContainer').innerHTML =
           "<p style='text-align:center;color:#888;padding:40px;font-size:15px;'>لا توجد أوردرات لهذا اليوم</p>";
+        // لو مفيش بيانات، نخلي الليبُل يظهر صفر (اتعمل فوق)
+        document.getElementById('pageFooter').style.display = 'block';
         return;
       }
 
