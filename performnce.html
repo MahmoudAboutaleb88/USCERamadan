@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>تقييم وجبات رمضان</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --surface2: #1a1a26;
+      --border: rgba(255,255,255,0.07);
+      --border2: rgba(255,255,255,0.12);
+      --gold: #c9a84c;
+      --gold2: #e8c97a;
+      --rose: #c0666a;
+      --teal: #4a9e9e;
+      --text: #e8e4d9;
+      --muted: #6e6a60;
+      --ex: #5dba7e;
+      --good: #5d9eba;
+      --avg: #c9a84c;
+      --bad: #c0666a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Tajawal', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ====== BACKGROUND ====== */
+    .bg-art {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none;
+      overflow: hidden;
+    }
+    .bg-art::before {
+      content: '';
+      position: absolute;
+      width: 900px; height: 900px;
+      top: -300px; right: -200px;
+      background: radial-gradient(circle, rgba(201,168,76,0.06) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .bg-art::after {
+      content: '';
+      position: absolute;
+      width: 600px; height: 600px;
+      bottom: -100px; left: -150px;
+      background: radial-gradient(circle, rgba(74,158,158,0.07) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    /* Geometric Islamic pattern overlay */
+    .pattern-overlay {
+      position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='1'%3E%3Cpath d='M30 0l8.66 15H21.34L30 0zm0 60l-8.66-15h17.32L30 60zM0 30l15-8.66V38.66L0 30zm60 0l-15 8.66V21.34L60 30z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    /* ====== LAYOUT ====== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* ====== HEADER ====== */
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 36px;
+      margin-bottom: 28px;
+      background: linear-gradient(135deg, rgba(17,17,24,0.95), rgba(26,26,38,0.95));
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      backdrop-filter: blur(20px);
+      position: relative;
+      overflow: hidden;
+    }
+    .site-header::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 200px; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.05));
+    }
+    .header-left {}
+    .header-title {
+      font-family: 'Amiri', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--gold2);
+      line-height: 1.2;
+    }
+    .header-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 400;
+    }
+    .header-emblem {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    .crescent {
+      font-size: 48px;
+      line-height: 1;
+      filter: drop-shadow(0 0 20px rgba(201,168,76,0.5));
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%,100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    .ramadan-text {
+      font-family: 'Amiri', serif;
+      font-size: 13px;
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    /* ====== TABS ====== */
+    .tabs-wrapper {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 6px;
+    }
+    .tab-btn {
+      flex: 1;
+      padding: 12px 20px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-family: 'Tajawal', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .tab-btn.active {
+      background: linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.08));
+      color: var(--gold2);
+      border: 1px solid rgba(201,168,76,0.25);
+    }
+    .tab-icon { font-size: 18px; }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
+    @keyframes fadeIn { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ====== CARDS ====== */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 24px;
+      margin-bottom: 20px;
+      backdrop-filter: blur(10px);
+    }
+    .card-title {
+      font-family: 'Amiri', serif;
+      font-size: 18px;
+      color: var(--gold);
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .card-title-icon {
+      width: 32px; height: 32px;
+      background: rgba(201,168,76,0.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    /* ====== FORM FIELDS ====== */
+    .fields-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+    .field-group { display: flex; flex-direction: column; gap: 7px; }
+    .field-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .field-input {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 11px 14px;
+      color: var(--text);
+      font-family: 'Tajawal', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .field-input:focus { border-color: rgba(201,168,76,0.4); }
+    .field-input option { background: #1a1a26; }
+
+    /* ====== RATING STARS — INNOVATIVE ====== */
+    .criteria-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    @media(max-width:640px) { .criteria-grid { grid-template-columns: 1fr; } }
+
+    .criterion-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+      transition: border-color 0.3s;
+    }
+    .criterion-card.has-value { border-color: rgba(201,168,76,0.3); }
+
+    .criterion-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .criterion-num {
+      width: 22px; height: 22px;
+      background: rgba(201,168,76,0.15);
+      color: var(--gold);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 900;
+    }
+
+    /* Emoji-style rating buttons */
+    .rating-options {
+      display: flex;
+      gap: 8px;
+    }
+    .rating-opt {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 6px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      cursor: pointer;
+      transition: all 0.25s;
+      position: relative;
+    }
+    .rating-opt:hover { border-color: var(--border2); transform: translateY(-2px); }
+    .rating-opt .opt-emoji { font-size: 22px; transition: transform 0.2s; }
+    .rating-opt .opt-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    .rating-opt[data-val="ممتاز"].active { background: rgba(93,186,126,0.15); border-color: #5dba7e; }
+    .rating-opt[data-val="ممتاز"].active .opt-label { color: #5dba7e; }
+    .rating-opt[data-val="ممتاز"].active .opt-emoji { transform: scale(1.2); }
+
+    .rating-opt[data-val="جيد"].active { background: rgba(93,158,186,0.15); border-color: #5d9eba; }
+    .rating-opt[data-val="جيد"].active .opt-label { color: #5d9eba; }
+    .rating-opt[data-val="جيد"].active .opt-emoji { transform: scale(1.2); }
+
+    .rating-opt[data-val="مقبول"].active { background: rgba(201,168,76,0.15); border-color: var(--gold); }
+    .rating-opt[data-val="مقبول"].active .opt-label { color: var(--gold); }
+    .rating-opt[data-val="مقبول"].active .opt-emoji { transform: scale(1.2); }
+
+    .rating-opt[data-val="ضعيف"].active { background: rgba(192,102,106,0.15); border-color: var(--rose); }
+    .rating-opt[data-val="ضعيف"].active .opt-label { color: var(--rose); }
+    .rating-opt[data-val="ضعيف"].active .opt-emoji { transform: scale(1.2); }
+
+    /* Checkmark badge */
+    .criterion-check {
+      display: none;
+      width: 18px; height: 18px;
+      background: var(--ex);
+      border-radius: 50%;
+      align-items: center; justify-content: center;
+      font-size: 10px; color: white;
+      margin-right: auto;
+    }
+    .criterion-card.has-value .criterion-check { display: flex; }
+
+    /* ====== SCORE PREVIEW ====== */
+    .score-preview {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+    }
+    .score-label { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .score-value { font-family: 'Amiri', serif; font-size: 28px; color: var(--gold2); font-weight: 700; }
+    .score-meter {
+      flex: 1;
+      margin: 0 20px;
+      height: 8px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .score-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--rose), var(--avg), var(--ex));
+      border-radius: 99px;
+      transition: width 0.5s cubic-bezier(.4,0,.2,1);
+      width: 0%;
+    }
+
+    /* ====== NOTES & SUBMIT ====== */
+    textarea.field-input {
+      min-height: 90px;
+      resize: vertical;
+      width: 100%;
+    }
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #b8860b, #c9a84c, #e8c97a);
+      color: #0a0a0f;
+      font-family: 'Tajawal', sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+      letter-spacing: 0.5px;
+      margin-top: 14px;
+      box-shadow: 0 8px 24px rgba(201,168,76,0.25);
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(201,168,76,0.35); }
+    .submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ====== ANALYTICS ====== */
+    /* Stats Bar */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:700px) { .stats-row { grid-template-columns: repeat(2,1fr); } }
+
+    .stat-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      transition: transform 0.2s;
+    }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-emoji { font-size: 24px; }
+    .stat-num {
+      font-family: 'Amiri', serif;
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1;
+    }
+    .stat-card.total .stat-num { color: var(--gold2); }
+    .stat-card.ex .stat-num { color: var(--ex); }
+    .stat-card.good .stat-num { color: var(--good); }
+    .stat-card.avg .stat-num { color: var(--avg); }
+    .stat-card.bad .stat-num { color: var(--bad); }
+    .stat-lbl { font-size: 12px; color: var(--muted); font-weight: 600; }
+
+    /* Filters */
+    .filters-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .filters-row .field-input { flex: 1; min-width: 160px; }
+
+    /* Charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    @media(max-width:700px) { .charts-grid { grid-template-columns: 1fr; } }
+
+    .chart-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .chart-box.wide {
+      grid-column: 1 / -1;
+    }
+    .chart-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Radar box */
+    .radar-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Heat bar per category */
+    .cat-bars { display: flex; flex-direction: column; gap: 10px; }
+    .cat-row { display: flex; flex-direction: column; gap: 5px; }
+    .cat-name { font-size: 12px; font-weight: 700; color: var(--muted); }
+    .cat-bar-track {
+      height: 28px;
+      background: rgba(255,255,255,0.04);
+      border-radius: 6px;
+      display: flex;
+      overflow: hidden;
+      gap: 2px;
+    }
+    .cat-seg {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 800;
+      color: rgba(0,0,0,0.7);
+      transition: width 0.6s cubic-bezier(.4,0,.2,1);
+      min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+    .cat-seg.ex { background: var(--ex); border-radius: 4px 0 0 4px; }
+    .cat-seg.good { background: var(--good); }
+    .cat-seg.avg { background: var(--avg); }
+    .cat-seg.bad { background: var(--bad); border-radius: 0 4px 4px 0; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; }
+    thead th {
+      background: rgba(201,168,76,0.08);
+      color: var(--gold);
+      padding: 12px 10px;
+      font-size: 12px;
+      font-weight: 700;
+      border-bottom: 1px solid var(--border2);
+      white-space: nowrap;
+      text-align: right;
+    }
+    tbody td {
+      padding: 11px 10px;
+      font-size: 13px;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+    }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+    .badge-val {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .badge-val.ممتاز { background: rgba(93,186,126,0.15); color: var(--ex); border: 1px solid rgba(93,186,126,0.3); }
+    .badge-val.جيد { background: rgba(93,158,186,0.15); color: var(--good); border: 1px solid rgba(93,158,186,0.3); }
+    .badge-val.مقبول { background: rgba(201,168,76,0.15); color: var(--avg); border: 1px solid rgba(201,168,76,0.3); }
+    .badge-val.ضعيف { background: rgba(192,102,106,0.15); color: var(--bad); border: 1px solid rgba(192,102,106,0.3); }
+
+    /* ====== TOAST ====== */
+    .toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      padding: 13px 24px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      transition: transform 0.35s cubic-bezier(.4,0,.2,1);
+      z-index: 999;
+      white-space: nowrap;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .toast.success { border-color: rgba(93,186,126,0.4); }
+    .toast.error { border-color: rgba(192,102,106,0.4); }
+  </style>
+</head>
+<body>
+
+<div class="bg-art"></div>
+<div class="pattern-overlay"></div>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <header class="site-header">
+    <div class="header-left">
+      <div class="header-title">نموذج تقييم وجبات رمضان</div>
+      <div class="header-sub">فضلاً قم باستيفاء البيانات لدعم تحسين الخدمة</div>
+    </div>
+    <div class="header-emblem">
+      <div class="crescent">🌙</div>
+      <div class="ramadan-text">رمضان كريم</div>
+    </div>
+  </header>
+
+  <!-- TABS -->
+  <div class="tabs-wrapper">
+    <button class="tab-btn active" data-tab="form">
+      <span class="tab-icon">📝</span> تعبئة التقييم
+    </button>
+    <button class="tab-btn" data-tab="analytics">
+      <span class="tab-icon">📊</span> لوحة التحليل
+    </button>
+  </div>
+
+  <!-- ===================== FORM ===================== -->
+  <div id="form" class="tab-content active">
+
+    <!-- Basic Info -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">📋</div>
+        البيانات الأساسية
+      </div>
+      <div class="fields-grid">
+        <div class="field-group">
+          <div class="field-label">التاريخ</div>
+          <input type="date" id="dateInput" class="field-input">
+        </div>
+        <div class="field-group">
+          <div class="field-label">اليوم</div>
+          <input type="text" id="dayLabel" class="field-input" readonly>
+        </div>
+        <div class="field-group">
+          <div class="field-label">الاسم</div>
+          <input type="text" id="nameInput" class="field-input" placeholder="أدخل اسمك">
+        </div>
+        <div class="field-group">
+          <div class="field-label">القسم</div>
+          <select id="deptSelect" class="field-input">
+            <option value="" disabled selected>اختر القسم</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ratings -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">⭐</div>
+        تقييم الوجبة
+      </div>
+
+      <!-- Score Preview -->
+      <div class="score-preview">
+        <div>
+          <div class="score-label">التقييم الكلي</div>
+        </div>
+        <div class="score-meter"><div class="score-fill" id="scoreFill"></div></div>
+        <div class="score-value" id="scoreText">—</div>
+      </div>
+
+      <div class="criteria-grid">
+
+        <div class="criterion-card" id="crit-quality">
+          <div class="criterion-label">
+            <div class="criterion-num">١</div>
+            جودة الطعام
+            <div class="criterion-check">✓</div>
+          </div>
+          <div class="rating-options" data-key="quality">
+            <div class="rating-opt" data-val="ممتاز"><div class="opt-emoji">🤩</div><div class="opt-label">ممتاز</div></div>
+            <div class="rating-opt" data-val="جيد"><div class="opt-emoji">😊</div><div class="opt-label">جيد</div></div>
+            <div class="rating-opt" data-val="مقبول"><div class="opt-emoji">😐</div><div class="opt-label">مقبول</div></div>
+            <div class="rating-opt" data-val="ضعيف"><div class="opt-emoji">😞</div><div class="opt-label">ضعيف</div></div>
+          </div>
+        </div>
+
+        <div class="criterion-card" id="crit-taste">
+          <div class="criterion-label">
+            <div class="criterion-num">٢</div>
+            مستوى التذوق
+            <div class="criterion-check">✓</div>
+          </div>
+          <div class="rating-options" data-key="taste">
+            <div class="rating-opt" data-val="ممتاز"><div class="opt-emoji">😋</div><div class="opt-label">ممتاز</div></div>
+            <div class="rating-opt" data-val="جيد"><div class="opt-emoji">🙂</div><div class="opt-label">جيد</div></div>
+            <div class="rating-opt" data-val="مقبول"><div class="opt-emoji">😑</div><div class="opt-label">مقبول</div></div>
+            <div class="rating-opt" data-val="ضعيف"><div class="opt-emoji">🤢</div><div class="opt-label">ضعيف</div></div>
+          </div>
+        </div>
+
+        <div class="criterion-card" id="crit-portions">
+          <div class="criterion-label">
+            <div class="criterion-num">٣</div>
+            الكميات المقدمة
+            <div class="criterion-check">✓</div>
+          </div>
+          <div class="rating-options" data-key="portions">
+            <div class="rating-opt" data-val="ممتاز"><div class="opt-emoji">🍽️</div><div class="opt-label">ممتاز</div></div>
+            <div class="rating-opt" data-val="جيد"><div class="opt-emoji">🥘</div><div class="opt-label">جيد</div></div>
+            <div class="rating-opt" data-val="مقبول"><div class="opt-emoji">🥗</div><div class="opt-label">مقبول</div></div>
+            <div class="rating-opt" data-val="ضعيف"><div class="opt-emoji">🍜</div><div class="opt-label">ضعيف</div></div>
+          </div>
+        </div>
+
+        <div class="criterion-card" id="crit-presentation">
+          <div class="criterion-label">
+            <div class="criterion-num">٤</div>
+            المظهر العام
+            <div class="criterion-check">✓</div>
+          </div>
+          <div class="rating-options" data-key="presentation">
+            <div class="rating-opt" data-val="ممتاز"><div class="opt-emoji">✨</div><div class="opt-label">ممتاز</div></div>
+            <div class="rating-opt" data-val="جيد"><div class="opt-emoji">👌</div><div class="opt-label">جيد</div></div>
+            <div class="rating-opt" data-val="مقبول"><div class="opt-emoji">👐</div><div class="opt-label">مقبول</div></div>
+            <div class="rating-opt" data-val="ضعيف"><div class="opt-emoji">👎</div><div class="opt-label">ضعيف</div></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Notes & Submit -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">💬</div>
+        ملاحظات إضافية <span style="color:var(--muted);font-size:13px;font-weight:400;">(اختياري)</span>
+      </div>
+      <textarea id="notesInput" class="field-input" placeholder="شاركنا رأيك لتحسين الخدمة..."></textarea>
+      <button class="submit-btn" id="submitBtn" onclick="submitForm()">
+        📩 إرسال التقييم
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ===================== ANALYTICS ===================== -->
+  <div id="analytics" class="tab-content">
+
+    <!-- Stats -->
+    <div class="stats-row">
+      <div class="stat-card total">
+        <div class="stat-emoji">📌</div>
+        <div class="stat-num" id="statTotal">0</div>
+        <div class="stat-lbl">إجمالي التقييمات</div>
+      </div>
+      <div class="stat-card ex">
+        <div class="stat-emoji">🌟</div>
+        <div class="stat-num" id="statEx">0</div>
+        <div class="stat-lbl">ممتاز</div>
+      </div>
+      <div class="stat-card good">
+        <div class="stat-emoji">👍</div>
+        <div class="stat-num" id="statGood">0</div>
+        <div class="stat-lbl">جيد</div>
+      </div>
+      <div class="stat-card avg">
+        <div class="stat-emoji">👌</div>
+        <div class="stat-num" id="statAvg">0</div>
+        <div class="stat-lbl">مقبول</div>
+      </div>
+      <div class="stat-card bad">
+        <div class="stat-emoji">⚠️</div>
+        <div class="stat-num" id="statBad">0</div>
+        <div class="stat-lbl">ضعيف</div>
+      </div>
+    </div>
+
+    <!-- Filters -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">🔍</div>
+        فلاتر التحليل
+      </div>
+      <div class="filters-row">
+        <input type="date" id="analyticsDate" class="field-input" style="flex:0 0 180px">
+        <select id="analyticsDept" class="field-input">
+          <option value="">كل الأقسام</option>
+        </select>
+        <input type="text" id="searchEval" class="field-input" placeholder="🔍 بحث بالاسم أو الملاحظات...">
+      </div>
+    </div>
+
+    <!-- Charts Row 1 -->
+    <div class="charts-grid">
+
+      <!-- Donut Chart -->
+      <div class="chart-box">
+        <div class="chart-title">📊 توزيع التقييمات الكلي</div>
+        <select id="categorySelect" class="field-input" style="margin-bottom:14px;width:100%;font-size:13px;">
+          <option value="quality">جودة الطعام</option>
+          <option value="taste">مستوى التذوق</option>
+          <option value="portions">الكميات</option>
+          <option value="presentation">المظهر العام</option>
+        </select>
+        <canvas id="donutChart" height="220"></canvas>
+      </div>
+
+      <!-- Category Breakdown Bars -->
+      <div class="chart-box">
+        <div class="chart-title">📈 تحليل كل معيار</div>
+        <div class="cat-bars" id="catBars">
+          <div class="cat-row">
+            <div class="cat-name">جودة الطعام</div>
+            <div class="cat-bar-track">
+              <div class="cat-seg ex" id="bar-quality-ex" style="width:0%"></div>
+              <div class="cat-seg good" id="bar-quality-good" style="width:0%"></div>
+              <div class="cat-seg avg" id="bar-quality-avg" style="width:0%"></div>
+              <div class="cat-seg bad" id="bar-quality-bad" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="cat-row">
+            <div class="cat-name">مستوى التذوق</div>
+            <div class="cat-bar-track">
+              <div class="cat-seg ex" id="bar-taste-ex" style="width:0%"></div>
+              <div class="cat-seg good" id="bar-taste-good" style="width:0%"></div>
+              <div class="cat-seg avg" id="bar-taste-avg" style="width:0%"></div>
+              <div class="cat-seg bad" id="bar-taste-bad" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="cat-row">
+            <div class="cat-name">الكميات المقدمة</div>
+            <div class="cat-bar-track">
+              <div class="cat-seg ex" id="bar-portions-ex" style="width:0%"></div>
+              <div class="cat-seg good" id="bar-portions-good" style="width:0%"></div>
+              <div class="cat-seg avg" id="bar-portions-avg" style="width:0%"></div>
+              <div class="cat-seg bad" id="bar-portions-bad" style="width:0%"></div>
+            </div>
+          </div>
+          <div class="cat-row">
+            <div class="cat-name">المظهر العام</div>
+            <div class="cat-bar-track">
+              <div class="cat-seg ex" id="bar-presentation-ex" style="width:0%"></div>
+              <div class="cat-seg good" id="bar-presentation-good" style="width:0%"></div>
+              <div class="cat-seg avg" id="bar-presentation-avg" style="width:0%"></div>
+              <div class="cat-seg bad" id="bar-presentation-bad" style="width:0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Line Chart -->
+      <div class="chart-box wide">
+        <div class="chart-title">📅 التقييمات عبر الأيام</div>
+        <canvas id="lineChart" height="100"></canvas>
+      </div>
+
+    </div>
+
+    <!-- Table -->
+    <div class="card">
+      <div class="card-title">
+        <div class="card-title-icon">🗂️</div>
+        سجل التقييمات
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>التاريخ</th>
+              <th>اليوم</th>
+              <th>الاسم</th>
+              <th>القسم</th>
+              <th>الجودة</th>
+              <th>التذوق</th>
+              <th>الكميات</th>
+              <th>المظهر</th>
+              <th>الملاحظات</th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<!-- ============================== JS ============================== -->
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwIUGNXTUBjdikikZkwXh6mIWhZ3CTz_CKraMa9do7WkcfTlN5pny8V9-VUBlssnskjYA/exec";
+
+const DEPARTMENTS = [
+  "Administration","Electrical & Instrumentation","Finished Products","HSE",
+  "Mechanical Maintenance","Packing","Production","Quality","Vehicle Workshop",
+  "Utilities","Supply Planning","Spare Parts W/H","Projects","Logistics","Export","Costing"
+];
+
+const SCORE_MAP = { ممتاز:4, جيد:3, مقبول:2, ضعيف:1 };
+const KEYS = ["quality","taste","portions","presentation"];
+
+/* ===== TOAST ===== */
+function showToast(msg, type="") {
+  const t = document.getElementById("toast");
+  t.textContent = msg;
+  t.className = "toast " + type;
+  setTimeout(() => t.classList.add("show"), 20);
+  setTimeout(() => t.classList.remove("show"), 3500);
+}
+
+/* ===== TABS ===== */
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    const tab = btn.dataset.tab;
+    document.querySelectorAll(".tab-content").forEach(c => c.classList.remove("active"));
+    document.getElementById(tab).classList.add("active");
+    if (tab === "analytics") loadAnalytics();
+  });
+});
+
+/* ===== INIT FORM ===== */
+function todayStr() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function dayNameAr(ds) {
+  return new Date(ds).toLocaleDateString("ar-EG", { weekday:"long" });
+}
+
+(function initForm() {
+  const sel = document.getElementById("deptSelect");
+  sel.innerHTML = `<option value="" disabled selected>اختر القسم</option>` +
+    DEPARTMENTS.map(d => `<option>${d}</option>`).join("");
+
+  const dateEl = document.getElementById("dateInput");
+  dateEl.value = todayStr();
+  document.getElementById("dayLabel").value = dayNameAr(dateEl.value);
+  dateEl.addEventListener("change", () => {
+    document.getElementById("dayLabel").value = dayNameAr(dateEl.value);
+  });
+
+  // Fill analytics dept too
+  const asel = document.getElementById("analyticsDept");
+  asel.innerHTML = `<option value="">كل الأقسام</option>` +
+    DEPARTMENTS.map(d => `<option>${d}</option>`).join("");
+
+  // Rating buttons
+  document.querySelectorAll(".rating-options").forEach(group => {
+    group.querySelectorAll(".rating-opt").forEach(opt => {
+      opt.addEventListener("click", () => {
+        group.querySelectorAll(".rating-opt").forEach(o => o.classList.remove("active"));
+        opt.classList.add("active");
+        const key = group.dataset.key;
+        const card = document.getElementById("crit-"+key);
+        if (card) card.classList.add("has-value");
+        updateScorePreview();
+      });
+    });
+  });
+})();
+
+/* ===== SCORE PREVIEW ===== */
+function updateScorePreview() {
+  let total = 0, count = 0;
+  KEYS.forEach(k => {
+    const active = document.querySelector(`.rating-options[data-key="${k}"] .rating-opt.active`);
+    if (active) { total += SCORE_MAP[active.dataset.val] || 0; count++; }
+  });
+
+  const fill = document.getElementById("scoreFill");
+  const text = document.getElementById("scoreText");
+
+  if (count === 0) { fill.style.width = "0%"; text.textContent = "—"; return; }
+
+  const pct = ((total / (count * 4)) * 100).toFixed(0);
+  fill.style.width = pct + "%";
+
+  const avg = total / count;
+  if (avg >= 3.5) text.textContent = "ممتاز 🌟";
+  else if (avg >= 2.5) text.textContent = "جيد 👍";
+  else if (avg >= 1.5) text.textContent = "مقبول 👌";
+  else text.textContent = "ضعيف ⚠️";
+}
+
+/* ===== GET RATINGS ===== */
+function getRatings() {
+  const r = {};
+  KEYS.forEach(k => {
+    const active = document.querySelector(`.rating-options[data-key="${k}"] .rating-opt.active`);
+    r[k] = active ? active.dataset.val : "";
+  });
+  return r;
+}
+
+/* ===== VALIDATE ===== */
+function validateForm(data) {
+  const miss = [];
+  if (!data.name) miss.push("الاسم");
+  if (!data.department) miss.push("القسم");
+  if (!data.ratings.quality) miss.push("جودة الطعام");
+  if (!data.ratings.taste) miss.push("التذوق");
+  if (!data.ratings.portions) miss.push("الكميات");
+  if (!data.ratings.presentation) miss.push("المظهر");
+  return miss;
+}
+
+/* ===== SUBMIT ===== */
+async function submitForm() {
+  const btn = document.getElementById("submitBtn");
+
+  const payload = {
+    date: document.getElementById("dateInput").value,
+    day: document.getElementById("dayLabel").value,
+    name: document.getElementById("nameInput").value.trim(),
+    department: document.getElementById("deptSelect").value,
+    ratings: getRatings(),
+    notes: document.getElementById("notesInput").value.trim()
+  };
+
+  const miss = validateForm(payload);
+  if (miss.length) { showToast("⚠️ أكمل: " + miss.join("، ")); return; }
+
+  btn.disabled = true; btn.textContent = "⏳ جاري الإرسال...";
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type":"application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ action:"save_performance", row:JSON.stringify(payload) })
+    });
+    const out = await res.json();
+    if (!out.ok) throw new Error(out.message || "فشل الحفظ");
+
+    showToast("✅ تم إرسال التقييم بنجاح", "success");
+    document.getElementById("nameInput").value = "";
+    document.getElementById("deptSelect").value = "";
+    document.getElementById("notesInput").value = "";
+    document.querySelectorAll(".rating-opt").forEach(o => o.classList.remove("active"));
+    document.querySelectorAll(".criterion-card").forEach(c => c.classList.remove("has-value"));
+    updateScorePreview();
+
+  } catch (err) {
+    showToast("❌ " + err.message, "error");
+  }
+
+  btn.disabled = false; btn.textContent = "📩 إرسال التقييم";
+}
+
+/* ===== ANALYTICS ===== */
+let ALL_DATA = [];
+let donutChart, lineChart;
+
+async function loadAnalytics() {
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: { "Content-Type":"application/x-www-form-urlencoded" },
+      body: "action=get_performance"
+    });
+    const out = await res.json();
+    if (!out.ok) throw new Error(out.error);
+    ALL_DATA = out.data || [];
+    renderAnalytics();
+  } catch (err) {
+    showToast("❌ خطأ أثناء التحميل", "error");
+  }
+}
+
+function filterData() {
+  const date = document.getElementById("analyticsDate").value;
+  const dept = document.getElementById("analyticsDept").value;
+  const search = document.getElementById("searchEval").value.trim().toLowerCase();
+
+  return ALL_DATA.filter(r => {
+    if (date && r.Date !== date) return false;
+    if (dept && r.Department !== dept) return false;
+    if (search) {
+      const blob = (r.Name + " " + r["الملاحظات"]).toLowerCase();
+      if (!blob.includes(search)) return false;
+    }
+    return true;
+  });
+}
+
+function count(list, field) {
+  const c = { ممتاز:0, جيد:0, مقبول:0, ضعيف:0 };
+  list.forEach(r => { const v = r[field]; if (c[v] !== undefined) c[v]++; });
+  return c;
+}
+
+const FIELD_MAP = {
+  quality: "مستوى جودة الطعام",
+  taste: "مستوى تذوق الطعام",
+  portions: "الكميات المقدمة مع الوجبات",
+  presentation: "المظهر العام للوجبات"
+};
+
+function renderAnalytics() {
+  const list = filterData();
+
+  // Stats
+  const allVals = list.flatMap(r => KEYS.map(k => r[FIELD_MAP[k]]));
+  const tot = { ممتاز:0, جيد:0, مقبول:0, ضعيف:0 };
+  allVals.forEach(v => { if (tot[v] !== undefined) tot[v]++; });
+  document.getElementById("statTotal").textContent = list.length;
+  document.getElementById("statEx").textContent = tot.ممتاز;
+  document.getElementById("statGood").textContent = tot.جيد;
+  document.getElementById("statAvg").textContent = tot.مقبول;
+  document.getElementById("statBad").textContent = tot.ضعيف;
+
+  // Category bars
+  KEYS.forEach(k => {
+    const c = count(list, FIELD_MAP[k]);
+    const total = list.length || 1;
+    ["ex","good","avg","bad"].forEach((cls, i) => {
+      const labels = ["ممتاز","جيد","مقبول","ضعيف"];
+      const el = document.getElementById(`bar-${k}-${cls}`);
+      if (el) {
+        const pct = (c[labels[i]] / total * 100);
+        el.style.width = pct + "%";
+        el.textContent = pct > 8 ? Math.round(pct) + "%" : "";
+      }
+    });
+  });
+
+  // Donut
+  const selField = FIELD_MAP[document.getElementById("categorySelect").value];
+  const dc = count(list, selField);
+  if (donutChart) donutChart.destroy();
+  donutChart = new Chart(document.getElementById("donutChart"), {
+    type: "doughnut",
+    data: {
+      labels: ["ممتاز","جيد","مقبول","ضعيف"],
+      datasets: [{
+        data: [dc.ممتاز, dc.جيد, dc.مقبول, dc.ضعيف],
+        backgroundColor: ["#5dba7e","#5d9eba","#c9a84c","#c0666a"],
+        borderColor: "#111118",
+        borderWidth: 3,
+        hoverOffset: 6
+      }]
+    },
+    options: {
+      cutout: "65%",
+      plugins: {
+        legend: {
+          position: "bottom",
+          labels: { color: "#e8e4d9", font: { family:"Tajawal", size:12, weight:"700" }, padding:12 }
+        }
+      }
+    }
+  });
+
+  // Line
+  const byDate = {};
+  list.forEach(r => { byDate[r.Date] = (byDate[r.Date]||0) + 1; });
+  const sortedDates = Object.keys(byDate).sort();
+
+  if (lineChart) lineChart.destroy();
+  lineChart = new Chart(document.getElementById("lineChart"), {
+    type: "line",
+    data: {
+      labels: sortedDates,
+      datasets: [{
+        label: "عدد التقييمات",
+        data: sortedDates.map(d => byDate[d]),
+        borderColor: "#c9a84c",
+        backgroundColor: "rgba(201,168,76,0.1)",
+        tension: 0.4,
+        fill: true,
+        pointBackgroundColor: "#c9a84c",
+        pointRadius: 5,
+        pointHoverRadius: 7
+      }]
+    },
+    options: {
+      scales: {
+        x: { ticks: { color:"#6e6a60", font:{family:"Tajawal"} }, grid: { color:"rgba(255,255,255,0.04)" } },
+        y: { ticks: { color:"#6e6a60", font:{family:"Tajawal"} }, grid: { color:"rgba(255,255,255,0.04)" }, beginAtZero: true }
+      },
+      plugins: { legend: { labels: { color:"#e8e4d9", font:{family:"Tajawal",weight:"700"} } } }
+    }
+  });
+
+  // Table
+  const body = document.getElementById("resultsBody");
+  body.innerHTML = "";
+  list.forEach((r, i) => {
+    const vals = KEYS.map(k => `<td><span class="badge-val ${r[FIELD_MAP[k]]}">${r[FIELD_MAP[k]]||"—"}</span></td>`).join("");
+    body.innerHTML += `
+      <tr>
+        <td>${i+1}</td>
+        <td>${r.Date||""}</td>
+        <td>${r.Day||""}</td>
+        <td>${r.Name||""}</td>
+        <td>${r.Department||""}</td>
+        ${vals}
+        <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${r["الملاحظات"]||""}">${r["الملاحظات"]||"—"}</td>
+      </tr>`;
+  });
+}
+
+document.querySelectorAll("#analyticsDate,#analyticsDept,#categorySelect").forEach(el =>
+  el.addEventListener("change", renderAnalytics)
+);
+document.getElementById("searchEval").addEventListener("input", renderAnalytics);
+</script>
+</body>
+</html>
