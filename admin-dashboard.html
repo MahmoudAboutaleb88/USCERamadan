@@ -215,6 +215,14 @@
       color: var(--gold);
     }
 
+    /* ✅ عناصر الفلاتر */
+    .toolbar-filters {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
     .search-box {
       display: flex;
       align-items: center;
@@ -238,8 +246,19 @@
     }
 
     .search-box input::placeholder { color: var(--muted); }
-
     .search-icon { color: var(--muted); font-size: 16px; }
+
+    .select-box {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 8px 12px;
+      color: var(--text);
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+      min-width: 160px;
+      backdrop-filter: blur(8px);
+    }
 
     /* ── Table ── */
     .table-wrap {
@@ -295,9 +314,17 @@
       display: inline-block;
     }
 
-    .name-cell {
-      font-weight: 600;
+    .shift-cell {
+      font-family: monospace;
+      font-size: 13px;
+      color: #ffd6dc;
+      background: rgba(233,69,96,0.12);
+      padding: 4px 10px;
+      border-radius: 6px;
+      display: inline-block;
     }
+
+    .name-cell { font-weight: 600; }
 
     .dept-cell {
       font-size: 12px;
@@ -379,16 +406,6 @@
       border-right: 3px solid var(--gold);
     }
 
-    /* ── Select All row ── */
-    .select-all-row th {
-      padding: 10px 20px;
-      background: rgba(233,69,96,0.06);
-      border-bottom: 1px solid var(--border);
-      font-size: 13px;
-      color: var(--muted);
-      font-weight: 600;
-    }
-
     /* ── Selected Panel ── */
     .selected-panel {
       margin-top: 32px;
@@ -423,9 +440,6 @@
       cursor: pointer;
       transition: all 0.25s;
       box-shadow: 0 4px 15px rgba(39,174,96,0.35);
-      display: flex;
-      align-items: center;
-      gap: 8px;
     }
 
     .save-btn:hover:not(:disabled) {
@@ -505,8 +519,10 @@
     @media (max-width: 700px) {
       header  { padding: 16px 20px; }
       main    { padding: 20px 16px; }
-      .search-box { min-width: 100%; }
       .toolbar { flex-direction: column; align-items: flex-start; }
+      .toolbar-filters { width: 100%; }
+      .search-box { min-width: 0; flex:1; }
+      .select-box { width: 100%; }
     }
   </style>
 </head>
@@ -575,11 +591,25 @@
     <div class="toolbar-title">
       موظفو إدارة <span id="toolbarDept">...</span>
     </div>
-    <div class="search-box">
-      <span class="search-icon">🔎</span>
-      <input type="text" id="searchInput"
-             placeholder="ابحث بالاسم أو الرقم..."
-             oninput="filterTable()">
+
+    <div class="toolbar-filters">
+      <!-- 🔽 Shift Filter -->
+      <select id="shiftFilter" class="select-box" onchange="applyFilters()">
+        <option value="">كل الورديات</option>
+        <option value="Dayshift">Dayshift</option>
+        <option value="A">A</option>
+        <option value="B">B</option>
+        <option value="C">C</option>
+        <option value="D">D</option>
+      </select>
+
+      <!-- 🔎 Text Search -->
+      <div class="search-box">
+        <span class="search-icon">🔎</span>
+        <input type="text" id="searchInput"
+               placeholder="ابحث بالاسم أو الرقم أو الوردية..."
+               oninput="applyFilters()">
+      </div>
     </div>
   </div>
 
@@ -606,6 +636,7 @@
           </th>
           <th style="width:50px">#</th>
           <th>الرقم الوظيفي</th>
+          <th>الوردية</th> <!-- ✅ عمود الشيفت كود -->
           <th>الاسم الكامل</th>
           <th>الإدارة</th>
         </tr>
@@ -627,7 +658,7 @@
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
         <button class="clear-btn" onclick="clearSelection()">🗑️ مسح الاختيار</button>
         <button class="save-btn" id="saveBtn" onclick="saveOrders()">
-          <span>💾</span> حفظ في Orders
+          💾 حفظ في Orders
         </button>
       </div>
     </div>
@@ -638,6 +669,7 @@
           <tr>
             <th>#</th>
             <th>الرقم الوظيفي</th>
+            <th>الوردية</th>
             <th>الاسم الكامل</th>
             <th>الإدارة</th>
             <th>التاريخ</th>
@@ -657,14 +689,14 @@
   // ============================================================
   // ⚙️ الإعدادات
   // ============================================================
-  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwztJdA4AcbAlXIggDE_eEZVPOhiF0H6kIZ3WnVLsYatrXWSa0bHOrXK_1fnrKH131jmg/exec';
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwYl-U9yByNIgssSYI5jN9TaFaFfnWLMDxTPSrebBqdRXF88lISQ2oVEfjc3ZnbNz_5tg/exec';
   // ============================================================
 
   let allEmployees  = [];
-  let selectedEmps  = new Map();
+  let filteredEmps  = [];
+  let selectedEmps  = new Map(); // key: unique employee ID
   let todayNames    = new Set();
   const TODAY_STR = new Date().toISOString().split('T')[0];
-
 
   const rawUser = sessionStorage.getItem('currentUser');
   if (!rawUser) window.location.assign('index.html');
@@ -688,8 +720,7 @@
   // ============================================================
   async function loadEmployees() {
     try {
-
-      todayNames.clear();   // مهم جداً
+      todayNames.clear();
 
       const [empRes, todayRes] = await Promise.all([
         fetch(SCRIPT_URL, {
@@ -725,17 +756,22 @@
       }
 
       if (todayResult.ok && todayResult.names) {
-        todayResult.names.forEach(n =>
-          todayNames.add(n.trim().toLowerCase())
-        );
+        todayResult.names.forEach(n => todayNames.add(n.trim().toLowerCase()));
       }
 
-      allEmployees = empResult.employees || [];
+      // 🧠 تأكيد الحقول + دعم تسميات مختلفة للوردية
+      allEmployees = (empResult.employees || []).map(e => ({
+        id:   String(e.id   ?? '').trim(),
+        name: String(e.name ?? '').trim(),
+        dept: String(e.dept ?? '').trim(),
+        shift: String((e.shift ?? e.shift_code ?? e.Shift_Code ?? '')).trim()
+      }));
 
-      document.getElementById('statTotal').textContent    = allEmployees.length;
-      document.getElementById('statFiltered').textContent = allEmployees.length;
+      document.getElementById('statTotal').textContent = allEmployees.length;
 
-      renderTable(allEmployees);
+      // تطبيق الفلاتر المبدئية
+      applyFilters();
+
       document.getElementById('empTable').style.display = 'table';
 
     } catch (err) {
@@ -749,26 +785,28 @@
   // رسم الجدول
   // ============================================================
   function renderTable(employees) {
-
     const tbody = document.getElementById('empBody');
     tbody.innerHTML = '';
 
     if (employees.length === 0) {
       document.getElementById('noResults').style.display = 'block';
+      document.getElementById('statFiltered').textContent = 0;
+      syncSelectAll();
       return;
     }
 
     document.getElementById('noResults').style.display = 'none';
 
     employees.forEach((emp, i) => {
-
       const isChecked = selectedEmps.has(emp.id);
-      const isAdded   = todayNames.has(emp.name.trim().toLowerCase());
+      const isAdded   = todayNames.has((emp.name || '').trim().toLowerCase());
 
       const tr = document.createElement('tr');
 
       if (isChecked) tr.classList.add('selected-row');
       if (isAdded)   tr.classList.add('already-added');
+
+      const safeName = (emp.name || '').replace(/'/g,"\\'");
 
       tr.innerHTML = `
         <td>
@@ -777,11 +815,12 @@
               data-id="${emp.id}"
               ${isChecked ? 'checked' : ''}
               ${isAdded ? 'disabled' : ''}
-              onchange="toggleEmployee(this,'${emp.id}','${emp.name.replace(/'/g,"\\'")}','${emp.dept}')">
+              onchange="toggleEmployee(this,'${emp.id}','${safeName}','${emp.dept}','${emp.shift || ''}')">
           </div>
         </td>
         <td class="row-num">${i + 1}</td>
         <td><span class="id-cell">${emp.id}</span></td>
+        <td><span class="shift-cell">${emp.shift || ''}</span></td>
         <td class="name-cell">
           ${isAdded ? '<span class="added-badge">✓ مضاف</span>' : ''}
           ${emp.name}
@@ -792,14 +831,15 @@
       tbody.appendChild(tr);
     });
 
+    document.getElementById('statFiltered').textContent = employees.length;
     syncSelectAll();
   }
 
-  function toggleEmployee(cb, id, name, dept) {
+  function toggleEmployee(cb, id, name, dept, shift) {
     const tr = cb.closest('tr');
 
     if (cb.checked) {
-      selectedEmps.set(id, { id, name, dept });
+      selectedEmps.set(id, { id, name, dept, shift });
       tr.classList.add('selected-row');
     } else {
       selectedEmps.delete(id);
@@ -816,12 +856,13 @@
     rows.forEach(tr => {
       const rowCb = tr.querySelector('input[type="checkbox"]');
       const id    = rowCb.dataset.id;
-      const name  = tr.querySelector('.name-cell').innerText.trim();
+      const name  = tr.querySelector('.name-cell').innerText.trim().replace(/^✓ مضاف\s*/, '');
       const dept  = tr.querySelector('.dept-cell').innerText.trim();
+      const shift = tr.querySelector('.shift-cell').innerText.trim();
 
       if (cb.checked) {
         rowCb.checked = true;
-        selectedEmps.set(id, { id, name, dept });
+        selectedEmps.set(id, { id, name, dept, shift });
         tr.classList.add('selected-row');
       } else {
         rowCb.checked = false;
@@ -858,11 +899,13 @@
     tbody.innerHTML = '';
 
     let i = 1;
-    selectedEmps.forEach(emp => {
+    const list = Array.from(selectedEmps.values());
+    list.forEach(emp => {
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td class="row-num">${i++}</td>
         <td><span class="id-cell">${emp.id}</span></td>
+        <td><span class="shift-cell">${emp.shift || ''}</span></td>
         <td class="name-cell">${emp.name}</td>
         <td><span class="dept-cell">${emp.dept}</span></td>
         <td>${TODAY_STR}</td>
@@ -878,13 +921,13 @@
       cb.closest('tr').classList.remove('selected-row');
     });
     updateSelectedPanel();
+    syncSelectAll();
   }
 
   // ============================================================
   // حفظ في Orders (مع إعادة تحميل بعد النجاح)
   // ============================================================
   async function saveOrders() {
-
     if (selectedEmps.size === 0) return;
 
     const saveBtn = document.getElementById('saveBtn');
@@ -894,16 +937,24 @@
     const rows = [];
 
     selectedEmps.forEach(emp => {
+      const empName = (emp.name || '').trim();
+      if (!empName) return; // فاليديشن على الاسم فقط
       rows.push({
         date: TODAY_STR,
         submitted_by: user.User_Name,
-        employee: emp.name,
+        employee: empName,
         department: emp.dept
       });
     });
 
-    try {
+    if (rows.length === 0) {
+      showToast('⚠️ لا توجد صفوف صالحة للحفظ (الأسماء مطلوبة)', true);
+      saveBtn.disabled = false;
+      saveBtn.innerHTML = '💾 حفظ في Orders';
+      return;
+    }
 
+    try {
       const res = await fetch(SCRIPT_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -916,14 +967,9 @@
       const result = await res.json();
 
       if (result.ok) {
-
-        showToast(`✅ تم الحفظ بنجاح`);
-
+        showToast(`✅ تم الحفظ بنجاح (${rows.length})`);
         clearSelection();
-
-        // 🔥 إعادة تحميل البيانات فوراً
-        await loadEmployees();
-
+        await loadEmployees(); // إعادة تحميل بعد النجاح
       } else {
         showToast('❌ فشل الحفظ: ' + (result.message || result.error), true);
       }
@@ -936,14 +982,23 @@
     saveBtn.innerHTML = '💾 حفظ في Orders';
   }
 
-  function filterTable() {
-    const q = document.getElementById('searchInput').value.trim().toLowerCase();
-    const filtered = allEmployees.filter(e =>
-      e.name.toLowerCase().includes(q) ||
-      e.id.toLowerCase().includes(q)
-    );
-    document.getElementById('statFiltered').textContent = filtered.length;
-    renderTable(filtered);
+  // ============================================================
+  // الفلاتر: نص + وردية (Day/A/B/C/D)
+  // ============================================================
+  function applyFilters() {
+    const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    const shiftValue = document.getElementById('shiftFilter').value; // '', 'Day', 'A', 'B', 'C', 'D'
+
+    filteredEmps = allEmployees.filter(e => {
+      const nameMatch  = (e.name || '').toLowerCase().includes(q);
+      const idMatch    = (e.id   || '').toLowerCase().includes(q);
+      const shiftText  = (e.shift|| '').toLowerCase();
+      const shiftTextMatch = shiftText.includes(q);     // بحث بالنص
+      const shiftFilterMatch = !shiftValue || (e.shift === shiftValue); // فلتر الدروبلست
+      return (nameMatch || idMatch || shiftTextMatch) && shiftFilterMatch;
+    });
+
+    renderTable(filteredEmps);
   }
 
   function showToast(msg, isError = false) {
@@ -959,9 +1014,9 @@
     window.location.assign('index.html');
   }
 
+  // بدء التحميل
   loadEmployees();
 </script>
-
 
 </body>
 </html>
