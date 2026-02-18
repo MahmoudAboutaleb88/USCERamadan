@@ -123,6 +123,7 @@
     display:flex;
     align-items:center;
     gap:12px;
+    flex-wrap: wrap;
   }
 
   .print-btn {
@@ -151,7 +152,6 @@
   }
   .logout-btn:hover { background: #c0392b; color: #fff; }
 
-  /* === NEW: زر حذف البيانات === */
   .danger-btn {
     padding: 10px 24px;
     background: #fff;
@@ -166,31 +166,68 @@
   .danger-btn:hover { background: #b00020; color: #fff; }
   .danger-btn:disabled { opacity: .6; cursor: not-allowed; }
 
-  /* === NEW: إجمالي الأشخاص === */
-  .total-badge {
-    display: inline-flex;
+  /* ===== Stats Badges ===== */
+  .stats-row {
+    display: flex;
     align-items: center;
     gap: 8px;
-    background: #eef6ff;
-    color: #0b5cab;
-    border: 1px solid #b8d6ff;
+    flex-wrap: wrap;
+  }
+
+  .stat-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
     padding: 8px 12px;
     border-radius: 10px;
     font-weight: 700;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1;
     white-space: nowrap;
   }
-  .total-badge .dot {
+
+  /* إجمالي الموظفين - أزرق */
+  .stat-badge.employees {
+    background: #eef6ff;
+    color: #0b5cab;
+    border: 1px solid #b8d6ff;
+  }
+  .stat-badge.employees .dot { background: #0b5cab; }
+
+  /* إجمالي المقاول - برتقالي */
+  .stat-badge.contractor {
+    background: #fff7ed;
+    color: #b45309;
+    border: 1px solid #fcd69a;
+  }
+  .stat-badge.contractor .dot { background: #b45309; }
+
+  /* إجمالي الوجبات - أخضر */
+  .stat-badge.total-meals {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #86efac;
+    font-size: 14px;
+    padding: 9px 14px;
+  }
+  .stat-badge.total-meals .dot { background: #166534; }
+
+  .stat-badge .dot {
     width: 8px;
     height: 8px;
-    background: #0b5cab;
     border-radius: 50%;
     display: inline-block;
-    margin-left: 4px;
+    flex-shrink: 0;
   }
 
-  /* ===== Toast (رسائل) ===== */
+  .divider-badge {
+    color: #ccc;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 1;
+  }
+
+  /* ===== Toast ===== */
   .toast {
     position: fixed;
     bottom: 24px;
@@ -253,15 +290,33 @@
   <div class="right-group">
     <button class="print-btn" onclick="window.print()">🖨️ طباعة</button>
 
-    <!-- إجمالي الأشخاص -->
-    <div class="total-badge" id="totalCount" title="إجمالي عدد الأشخاص لجميع الإدارات">
-      <span class="dot" aria-hidden="true"></span>
-      <span>الإجمالي: 0</span>
+    <!-- إحصائيات -->
+    <div class="stats-row">
+      <!-- إجمالي الموظفين -->
+      <div class="stat-badge employees" id="empBadge" title="إجمالي عدد موظفين اليوم">
+        <span class="dot"></span>
+        <span>الموظفون: <strong id="empCount">—</strong></span>
+      </div>
+
+      <span class="divider-badge">+</span>
+
+      <!-- إجمالي المقاول -->
+      <div class="stat-badge contractor" id="conBadge" title="إجمالي وجبات المقاول اليوم">
+        <span class="dot"></span>
+        <span>المقاول: <strong id="conCount">—</strong></span>
+      </div>
+
+      <span class="divider-badge">=</span>
+
+      <!-- إجمالي الوجبات -->
+      <div class="stat-badge total-meals" id="totalBadge" title="إجمالي الوجبات المطلوبة">
+        <span class="dot"></span>
+        <span>إجمالي الوجبات: <strong id="totalCount">—</strong></span>
+      </div>
     </div>
   </div>
 
   <div class="left-group">
-    <!-- NEW: زر حذف البيانات -->
     <button id="deleteBtn" class="danger-btn" onclick="confirmDeleteAll()">🗑️ حذف البيانات</button>
     <button class="logout-btn" onclick="window.location.href='index.html'">🚪 تسجيل الخروج</button>
   </div>
@@ -277,13 +332,17 @@
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 
 <script>
-  const API_URL = "https://script.google.com/macros/s/AKfycbxFhhA5mG-jPSexRF0hQk-qJ6vB4JuzPcDxy1UQDHv6MP4asgYGWt2FMahmpWEm2JCPsg/exec";
+  const ORDERS_API   = "https://script.google.com/macros/s/AKfycbxFhhA5mG-jPSexRF0hQk-qJ6vB4JuzPcDxy1UQDHv6MP4asgYGWt2FMahmpWEm2JCPsg/exec";
+  const CONTRACTOR_API = "https://script.google.com/macros/s/AKfycbw7yJo25YWoIpzO5fw_WlOxzF6qytA8AxqIfgfXC_o6MsGwMLGbORkQa0zQ93rNJsNs6Q/exec";
+
+  let empTotal = 0;
+  let conTotal = 0;
 
   function showToast(msg, type = '') {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.className = `toast ${type} show`;
-    setTimeout(() => t.classList.remove('show'), 3000);
+    setTimeout(() => t.classList.remove('show'), 3500);
   }
 
   function getTodayStr() {
@@ -305,9 +364,17 @@
   document.getElementById('todayLabel').textContent = formatArabicDate(todayStr);
   document.getElementById('footerDate').textContent = todayStr;
 
+  function updateTotalsUI() {
+    document.getElementById('empCount').textContent   = empTotal;
+    document.getElementById('conCount').textContent   = conTotal === null ? '—' : conTotal;
+    const grand = empTotal + (conTotal || 0);
+    document.getElementById('totalCount').textContent = grand;
+  }
+
+  /* ===== جلب طلبات الموظفين ===== */
   async function fetchOrders() {
     try {
-      const res = await fetch(API_URL, {
+      const res = await fetch(ORDERS_API, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `action=get_orders`
@@ -320,23 +387,43 @@
 
       document.getElementById('loadingMsg').style.display = 'none';
 
-      // تحديث ليبُل الإجمالي
-      const totalLabel = document.getElementById('totalCount').querySelector('span:last-child');
-      totalLabel.textContent = `الإجمالي: ${todayOrders.length}`;
+      empTotal = todayOrders.length;
+      updateTotalsUI();
 
       if (todayOrders.length === 0) {
         document.getElementById('tablesContainer').innerHTML =
           "<p style='text-align:center;color:#888;padding:40px;font-size:15px;'>لا توجد أوردرات لهذا اليوم</p>";
-        document.getElementById('pageFooter').style.display = 'block';
-        return;
+      } else {
+        renderTables(todayOrders);
       }
 
-      renderTables(todayOrders);
       document.getElementById('pageFooter').style.display = 'block';
 
     } catch (err) {
       document.getElementById('loadingMsg').innerHTML =
-        `<p style="color:red;">❌ حدث خطأ: ${err.message}</p>`;
+        `<p style="color:red;">❌ حدث خطأ في تحميل الموظفين: ${err.message}</p>`;
+    }
+  }
+
+  /* ===== جلب كمية المقاول ===== */
+  async function fetchContractor() {
+    try {
+      const res = await fetch(CONTRACTOR_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `action=get_contractor&date=${todayStr}`
+      });
+      const data = await res.json();
+
+      if (!data.ok) throw new Error(data.error || "خطأ");
+
+      conTotal = data.quantity !== null ? Number(data.quantity) : 0;
+      updateTotalsUI();
+
+    } catch (err) {
+      conTotal = 0;
+      document.getElementById('conCount').textContent = 'خطأ';
+      console.warn('Contractor fetch error:', err.message);
     }
   }
 
@@ -392,15 +479,13 @@
     });
   }
 
-  // ===== NEW: حذف جميع بيانات الطلبات =====
+  /* ===== حذف جميع البيانات (موظفين + مقاول) ===== */
   async function confirmDeleteAll() {
     const btn = document.getElementById('deleteBtn');
 
-    // تأكيد أول
-    const ok = confirm("⚠️ تحذير هام: هذا الإجراء سيحذف جميع بيانات الطلبات (Orders) من الخادم.\nهل أنت متأكد أنك تريد المتابعة؟");
+    const ok = confirm("⚠️ تحذير هام: هذا الإجراء سيحذف جميع بيانات الطلبات (الموظفين والمقاول) من الخادم.\nهل أنت متأكد أنك تريد المتابعة؟");
     if (!ok) return;
 
-    // تأكيد ثاني بكتابة DELETE
     const text = prompt("من فضلك اكتب كلمة DELETE للموافقة على الحذف النهائي:");
     if ((text || '').trim().toUpperCase() !== 'DELETE') {
       showToast('تم إلغاء العملية.', 'warn');
@@ -411,26 +496,42 @@
       btn.disabled = true;
       btn.textContent = '⏳ جاري الحذف...';
 
-      const res = await fetch(API_URL, {
+      // حذف طلبات الموظفين
+      const r1 = await fetch(ORDERS_API, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: `action=delete_all_orders`
       });
-      const data = await res.json();
+      const d1 = await r1.json();
+      if (!d1.ok) throw new Error('فشل حذف الموظفين: ' + (d1.message || d1.error || ''));
 
-      if (!data.ok) {
-        throw new Error(data.message || data.error || 'فشل الحذف');
+      // حذف سجل المقاول لليوم الحالي
+      // أولاً: جلب rowIndex للمقاول
+      const r2 = await fetch(CONTRACTOR_API, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `action=get_contractor&date=${todayStr}`
+      });
+      const d2 = await r2.json();
+
+      if (d2.ok && d2.rowIndex) {
+        // حذف الصف
+        const r3 = await fetch(CONTRACTOR_API, {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: `action=delete_contractor&rowIndex=${d2.rowIndex}`
+        });
+        const d3 = await r3.json();
+        if (!d3.ok) throw new Error('فشل حذف المقاول: ' + (d3.message || d3.error || ''));
       }
 
       // تحديث الواجهة
       document.getElementById('tablesContainer').innerHTML = '';
-      document.getElementById('loadingMsg').style.display = 'none';
+      empTotal = 0;
+      conTotal = 0;
+      updateTotalsUI();
 
-      // تحديث الإجمالي
-      const totalLabel = document.getElementById('totalCount').querySelector('span:last-child');
-      totalLabel.textContent = `الإجمالي: 0`;
-
-      showToast(`✅ تم حذف جميع الطلبات بنجاح (عدد السجلات المحذوفة: ${data.cleared || 0})`, 'success');
+      showToast(`✅ تم حذف جميع البيانات بنجاح (موظفون: ${d1.cleared || 0} | مقاول: تم)`, 'success');
 
     } catch (err) {
       showToast('❌ حدث خطأ أثناء الحذف: ' + err.message, 'error');
@@ -440,8 +541,9 @@
     }
   }
 
+  // تحميل البيانات عند فتح الصفحة
   fetchOrders();
+  fetchContractor();
 </script>
 </body>
 </html>
-
