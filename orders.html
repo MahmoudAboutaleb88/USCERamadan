@@ -361,7 +361,7 @@
   }
 
   const todayStr = getTodayStr();
-  document.getElementById('todayLabel').textContent = formatArabicDate(todayStr);
+  document.getElementById('todayLabel').textContent = 'جميع الطلبات المسجّلة';
   document.getElementById('footerDate').textContent = todayStr;
 
   function updateTotalsUI() {
@@ -383,7 +383,7 @@
 
       if (!data.ok) throw new Error(data.error || "خطأ في البيانات");
 
-      const todayOrders = data.orders.filter(o => o.date === todayStr);
+      const todayOrders = data.orders;
 
       document.getElementById('loadingMsg').style.display = 'none';
 
